@@ -1,0 +1,70 @@
+<div class="slide slide3-validation">
+  <h1>Крок 2: Валідація</h1>
+  <p class="subtitle">Перевірка номера та статусу</p>
+
+  <div class="validation-card success">
+    <div class="icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <h3>Валідація номера</h3>
+    <p *ngIf="session?.licensePlate; else noPlate">
+      Номерний знак <strong>{{ session?.licensePlate }}</strong> розпізнано
+      успішно
+    </p>
+    <ng-template #noPlate>
+      <p>Розпізнавання номерного знаку...</p>
+    </ng-template>
+  </div>
+
+  <div class="alert-card warning">
+    <div class="alert-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <div class="alert-content">
+      <h4><i class="fas fa-exclamation-triangle"></i> Порушення виявлено!</h4>
+      <p>
+        Для фіксації порушення зробіть друге фото через
+        <strong>5 секунд</strong>
+      </p>
+      <div class="timer-display">
+        <i class="fas fa-clock"></i>
+        <span class="timer-value">{{ formattedTime }}</span>
+      </div>
+      <button
+        class="action-button"
+        (click)="takeSecondPhoto()"
+        [disabled]="timeRemaining > 0"
+      >
+        <i class="fas fa-camera"></i>
+        <span>{{
+          timeRemaining > 0 ? "Очікування..." : "Зробити друге фото"
+        }}</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="photo-saved-card">
+    <div class="card-icon">
+      <i class="fas fa-camera"></i>
+    </div>
+    <h4>Перше фото збережено:</h4>
+    <div class="photo-info" *ngIf="session?.firstPhoto">
+      <div class="photo-thumbnail">
+        <i class="fas fa-car"></i>
+        <span
+          *ngIf="session && session.firstPhoto && session.firstPhoto.timestamp"
+          >{{ formatDate(session.firstPhoto.timestamp) }}
+          {{ formatTime(session.firstPhoto.timestamp) }}</span
+        >
+      </div>
+      <div class="photo-details">
+        <p>
+          <strong>{{ session?.firstPhoto?.fileName }}</strong>
+        </p>
+        <p class="small" *ngIf="session?.licensePlate">
+          Номер: <strong>{{ session?.licensePlate }}</strong>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

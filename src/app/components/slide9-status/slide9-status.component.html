@@ -1,0 +1,52 @@
+<div class="slide slide9-status">
+  <div class="header-logos">
+    <div class="logo trident">
+      <i class="fas fa-landmark"></i>
+    </div>
+    <div class="logo dia">
+      <span>Дія</span>
+    </div>
+  </div>
+
+  <h1>Відстеження статусу</h1>
+  <p class="subtitle">Моніторинг розгляду звернення</p>
+
+  <div class="case-header" *ngIf="caseStatus">
+    <div class="case-id">
+      <span class="label">Заява №</span>
+      <span class="value">{{ caseStatus.caseId }}</span>
+    </div>
+    <span class="status-badge active">Активна</span>
+  </div>
+
+  <div class="case-info" *ngIf="caseStatus">
+    <div class="status-card success">
+      <div class="status-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h3>Заяву подано</h3>
+      <p>Ваша заява успішно відправлена до поліції</p>
+    </div>
+
+    <div class="info-card">
+      <div class="info-row">
+        <span class="label">Подано</span>
+        <span class="value">{{ formatDateTime(caseStatus.submittedAt) }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Номер ТЗ</span>
+        <span class="value">{{ caseStatus.licensePlate }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-footer" *ngIf="caseStatus">
+    <i class="fas fa-info-circle"></i>
+    <p>Ви отримаєте сповіщення, коли статус зміниться</p>
+  </div>
+
+  <button class="new-report-button" (click)="startNewReport()">
+    <i class="fas fa-plus-circle"></i>
+    <span>Зафіксувати нове порушення</span>
+  </button>
+</div>

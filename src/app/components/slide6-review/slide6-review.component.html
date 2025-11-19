@@ -1,0 +1,97 @@
+<div class="slide slide6-review">
+  <h1>Крок 5: Перевірка</h1>
+  <p class="subtitle">Валідація GPS та номера</p>
+
+  <div class="photo-section" *ngIf="session">
+    <div class="section-header">
+      <i class="fas fa-images"></i>
+      <span>Перше фото</span>
+    </div>
+
+    <div class="photo-card">
+      <div class="photo-details">
+        <div class="detail-row">
+          <span class="label">Час:</span>
+          <span class="value">{{
+            formatTime(session.firstPhoto.timestamp)
+          }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">GPS:</span>
+          <span class="value">{{
+            formatCoordinates(
+              session.firstPhoto.geoLocation.latitude,
+              session.firstPhoto.geoLocation.longitude
+            )
+          }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Номер:</span>
+          <span class="value">{{ session.licensePlate }}</span>
+        </div>
+      </div>
+
+      <div class="photo-thumbnail">
+        <i class="fas fa-car"></i>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <i class="fas fa-images"></i>
+      <span>Друге фото</span>
+    </div>
+
+    <div class="photo-card" *ngIf="session.secondPhoto">
+      <div class="photo-details">
+        <div class="detail-row">
+          <span class="label">Час:</span>
+          <span class="value">{{
+            formatTime(session.secondPhoto.timestamp)
+          }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">GPS:</span>
+          <span class="value">{{
+            formatCoordinates(
+              session.secondPhoto.geoLocation.latitude,
+              session.secondPhoto.geoLocation.longitude
+            )
+          }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Номер:</span>
+          <span class="value">{{ session.licensePlate }}</span>
+        </div>
+      </div>
+
+      <div class="photo-thumbnail">
+        <i class="fas fa-car"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="validation-section">
+    <div class="validation-card success">
+      <i class="fas fa-check-circle"></i>
+      <div class="validation-content">
+        <h4>GPS валідація</h4>
+        <p>Координати збігаються</p>
+        <span class="status-badge">Успішно</span>
+      </div>
+    </div>
+
+    <div class="validation-card success">
+      <i class="fas fa-check-circle"></i>
+      <div class="validation-content">
+        <h4>Номерний знак</h4>
+        <p>{{ session?.licensePlate }} ідентичний</p>
+        <span class="status-badge">Успішно</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="proceed-button" (click)="proceedToSubmit()">
+    <i class="fas fa-arrow-right"></i>
+    <span>Продовжити до подачі заяви</span>
+  </button>
+</div>

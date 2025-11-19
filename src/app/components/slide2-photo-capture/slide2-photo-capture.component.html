@@ -1,0 +1,159 @@
+<div class="slide slide2-photo-capture">
+  <h1>Крок 1: Фото фіксація</h1>
+  <p class="subtitle">Зробіть фото автомобіля</p>
+
+  <div class="camera-container">
+    <div
+      class="gps-status"
+      [class.active]="isGpsActive"
+      [class.error]="gpsError"
+    >
+      <i class="fas fa-map-marker-alt"></i>
+      <span>{{
+        isGpsActive ? "GPS: Активно" : gpsError || "GPS: Очікування..."
+      }}</span>
+    </div>
+
+    <div class="camera-preview" [class.active]="cameraActive">
+      <i class="fas fa-camera"></i>
+      <p>{{ cameraActive ? "Камера активна" : "Натисніть кнопку для фото" }}</p>
+    </div>
+
+    <div class="timestamp">{{ formatTime(currentTime) }}</div>
+  </div>
+
+  <button
+    class="capture-button"
+    (click)="openCamera()"
+    [disabled]="!isGpsActive || cameraActive || isProcessing"
+  >
+    <i
+      class="fas"
+      [class.fa-camera]="!isProcessing"
+      [class.fa-spinner]="isProcessing"
+      [class.fa-spin]="isProcessing"
+    ></i>
+    <span>{{
+      gpsError
+        ? "GPS недоступний"
+        : !isGpsActive
+        ? "Очікування GPS..."
+        : isProcessing
+        ? "Обробка..."
+        : isPhotoSubmitted
+        ? "Переробити фото"
+        : "Зробити фото"
+    }}</span>
+  </button>
+
+  <!-- GPS Error Alert -->
+  <div class="gps-error-alert" *ngIf="gpsError && !isPhotoSubmitted">
+    <i class="fas fa-exclamation-triangle"></i>
+    <div class="error-content">
+      <strong>Помилка GPS</strong>
+      <p>
+        {{ gpsError }}. Перевірте дозволи для визначення місцеположення в
+        налаштуваннях браузера.
+      </p>
+    </div>
+  </div>
+
+  <!-- Photo preview after capture -->
+  <div class="photo-preview" *ngIf="capturedPhoto && isPhotoSubmitted">
+    <div class="preview-header">
+      <i class="fas fa-check-circle"></i>
+      <span>Фото успішно зроблено</span>
+    </div>
+    <img [src]="capturedPhoto.imageData" alt="Captured photo" />
+
+    <div class="photo-time-info">
+      <i class="fas fa-clock"></i>
+      <div class="time-content">
+        <span class="time-label">Час фіксації:</span>
+        <span class="time-value">{{
+          formatTime(capturedPhoto.timestamp)
+        }}</span>
+      </div>
+    </div>
+
+    <div class="location-info">
+      <div class="location-header">
+        <i class="fas fa-map-marker-alt"></i>
+        <span>Координати GPS</span>
+      </div>
+      <div class="location-details">
+        <div class="location-item">
+          <span class="label">Широта:</span>
+          <span class="value"
+            >{{ capturedPhoto.geoLocation.latitude.toFixed(6) }}°</span
+          >
+        </div>
+        <div class="location-item">
+          <span class="label">Довгота:</span>
+          <span class="value"
+            >{{ capturedPhoto.geoLocation.longitude.toFixed(6) }}°</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <button class="continue-button" (click)="proceedToValidation()">
+      <span>Продовжити</span>
+      <i class="fas fa-arrow-right"></i>
+    </button>
+  </div>
+
+  <div class="requirements-card" *ngIf="!isPhotoSubmitted">
+    <div class="card-header">
+      <i class="fas fa-camera"></i>
+      <span>Спробуйте щоб у кадр потрапив:</span>
+    </div>
+    <ul class="requirements-list">
+      <li>
+        <i class="fas fa-check-circle"></i>
+        <span>Номерний знак автомобіля</span>
+      </li>
+      <li>
+        <i class="fas fa-check-circle"></i>
+        <span>Знак паркування для інвалідів</span>
+      </li>
+      <li>
+        <i class="fas fa-check-circle"></i>
+        <span>Автомобіль повністю</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="parking-signs" *ngIf="!isPhotoSubmitted">
+    <div class="sign-card">
+      <div class="sign-icon parking">
+        <span>P</span>
+      </div>
+      <div class="sign-info">
+        <strong>Знак 5.42.1</strong>
+        <span>Загальна парковка</span>
+      </div>
+    </div>
+
+    <div class="sign-card">
+      <div class="sign-icon disability">
+        <i class="fas fa-wheelchair"></i>
+      </div>
+      <div class="sign-info">
+        <strong>Знак 7.17</strong>
+        <span>Для інвалідів</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-note" *ngIf="!isPhotoSubmitted">
+    <i class="fas fa-info-circle"></i>
+    <h4>Знак "Водій з інвалідністю"</h4>
+    <p>
+      Квадрат синього кольору із стороною 150 мм і білим зображенням символу
+      таблички 7.17. Знак розміщується спереду і ззаду на механічних
+      транспортних засобах, якими керують водії з інвалідністю або водії, які
+      перевозять пасажирів з інвалідністю.
+    </p>
+  </div>
+</div>

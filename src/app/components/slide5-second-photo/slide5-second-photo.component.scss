@@ -1,0 +1,227 @@
+.slide5-second-photo {
+  background: white;
+  min-height: 100vh;
+
+  h1 {
+    color: #4169e1;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+
+  .subtitle {
+    color: #666;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .success-card {
+    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
+    border: 2px solid #4caf50;
+    border-radius: 20px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+
+    .success-icon {
+      font-size: 4rem;
+      color: #4caf50;
+      margin-bottom: 1rem;
+      animation: scaleIn 0.5s ease-out;
+    }
+
+    h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #2e7d32;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+
+      i {
+        color: #4caf50;
+      }
+    }
+
+    p {
+      color: #1b5e20;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .action-button {
+      width: 100%;
+      background: #4169e1;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+
+      &:hover:not(:disabled) {
+        background: #365abd;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(65, 105, 225, 0.3);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      i {
+        font-size: 1.25rem;
+      }
+    }
+
+    .gps-error-alert {
+      background: #ffebee;
+      border: 2px solid #f44336;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      text-align: left;
+
+      > i {
+        color: #f44336;
+        font-size: 1.5rem;
+        margin-top: 0.25rem;
+        flex-shrink: 0;
+      }
+
+      .error-content {
+        flex: 1;
+
+        strong {
+          display: block;
+          color: #c62828;
+          font-size: 0.95rem;
+          font-weight: 600;
+          margin-bottom: 0.25rem;
+        }
+
+        p {
+          color: #d32f2f;
+          font-size: 0.85rem;
+          line-height: 1.5;
+          margin: 0;
+        }
+      }
+    }
+
+    .info-panel {
+      background: white;
+      border-radius: 12px;
+      padding: 1.25rem;
+      text-align: left;
+
+      .panel-icon {
+        font-size: 1.5rem;
+        color: #4169e1;
+        margin-bottom: 0.75rem;
+      }
+
+      h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1rem;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f0f0f0;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &.highlight {
+          background: #fff8e1;
+          padding: 0.75rem;
+          margin: 0.5rem -0.25rem;
+          border-radius: 8px;
+          border-bottom: none;
+
+          .label {
+            color: #e65100;
+            font-weight: 600;
+          }
+
+          .value {
+            color: #e65100;
+            font-weight: 700;
+          }
+        }
+
+        .label {
+          font-size: 0.9rem;
+          color: #666;
+        }
+
+        .value {
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: #333;
+        }
+      }
+    }
+  }
+
+  .tip-card {
+    background: #e3f2fd;
+    border: 2px solid #2196f3;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+
+    i {
+      color: #2196f3;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    strong {
+      color: #1565c0;
+      margin-right: 0.5rem;
+    }
+
+    color: #1565c0;
+    font-size: 0.9rem;
+  }
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,48 @@
+<div class="slide slide4-timer">
+  <h1>Крок 3: Очікування</h1>
+  <p class="subtitle">Таймер зворотного відліку</p>
+
+  <div class="timer-container">
+    <div class="timer-icon">
+      <i class="fas fa-clock"></i>
+    </div>
+
+    <div class="timer-display">
+      {{ formattedTime }}
+    </div>
+
+    <p class="timer-label">хвилин до наступного фото</p>
+
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="progress"></div>
+    </div>
+
+    <div class="info-box">
+      <div class="info-icon">
+        <i class="fas fa-info-circle"></i>
+      </div>
+      <h4>Що далі?</h4>
+      <ul>
+        <li>Залишайтеся біля місця порушення</li>
+        <li>Зробіть друге фото під тим же ракурсом</li>
+        <li>Це підтвердить тривалість порушення</li>
+      </ul>
+    </div>
+
+    <div class="status-row">
+      <button class="status-button gps" [class.active]="isGpsActive">
+        <i class="fas fa-map-marker-alt"></i>
+        <span>GPS активний</span>
+      </button>
+      <button class="status-button photos">
+        <i class="fas fa-camera"></i>
+        <span>{{ photoCount }} фото</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <i class="fas fa-lightbulb"></i>
+    <p>Можете залишити додаток. Надішлемо сповіщення коли настане час.</p>
+  </div>
+</div>

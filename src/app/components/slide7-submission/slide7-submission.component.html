@@ -1,0 +1,108 @@
+<div class="slide slide7-submission">
+  <h1>Крок 6: Подача заяви</h1>
+  <p class="subtitle">Відправка до поліції</p>
+
+  <div class="violation-details-section">
+    <div class="section-header">
+      <i class="fas fa-file-alt"></i>
+      <span>Деталі порушення</span>
+    </div>
+
+    <div class="details-card" *ngIf="session">
+      <div class="detail-row">
+        <span class="label">Номер ТЗ:</span>
+        <span class="value">{{ session.licensePlate }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Адреса:</span>
+        <span class="value">{{ session.address || "вул. Хрещатик, 1" }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Дата:</span>
+        <span class="value">{{
+          formatDate(session.firstPhoto.timestamp)
+        }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Час:</span>
+        <span class="value"
+          >{{ formatTime(session.firstPhoto.timestamp) }} -
+          {{
+            session.secondPhoto
+              ? formatTime(session.secondPhoto.timestamp)
+              : "--:--"
+          }}</span
+        >
+      </div>
+      <div class="detail-row highlight">
+        <span class="label">Тривалість:</span>
+        <span class="value red">{{
+          formatDuration(session.duration || 300)
+        }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="materials-section">
+    <div class="section-header">
+      <i class="fas fa-paperclip"></i>
+      <span>Додані матеріали:</span>
+    </div>
+
+    <div class="material-item">
+      <i class="fas fa-camera"></i>
+      <div class="material-info">
+        <strong
+          >Фото 1 ({{
+            session && session.firstPhoto
+              ? formatTime(session.firstPhoto.timestamp)
+              : "--:--:--"
+          }})</strong
+        >
+        <span class="small">GPS-мітка</span>
+      </div>
+      <i class="fas fa-check-circle checked"></i>
+    </div>
+
+    <div class="material-item">
+      <i class="fas fa-camera"></i>
+      <div class="material-info">
+        <strong
+          >Фото 2 ({{
+            session && session.secondPhoto
+              ? formatTime(session.secondPhoto.timestamp)
+              : "--:--:--"
+          }})</strong
+        >
+        <span class="small">GPS-мітка</span>
+      </div>
+      <i class="fas fa-check-circle checked"></i>
+    </div>
+
+    <div class="material-item">
+      <i class="fas fa-file-alt"></i>
+      <div class="material-info">
+        <strong>Метадані GPS</strong>
+      </div>
+      <i class="fas fa-check-circle checked"></i>
+    </div>
+  </div>
+
+  <div class="ready-card">
+    <i class="fas fa-check-circle"></i>
+    <span>Готово до відправки</span>
+  </div>
+
+  <div class="info-note">
+    <p>Всі дані перевірено. Зараз буде надправлена до поліції</p>
+  </div>
+
+  <button
+    class="submit-button"
+    (click)="onSubmit()"
+    [disabled]="isSubmitting || !isReadyToSubmit"
+  >
+    <i class="fas fa-paper-plane"></i>
+    <span>{{ isSubmitting ? "Відправка..." : "Відправити заяву" }}</span>
+  </button>
+</div>

@@ -1,0 +1,75 @@
+<div class="slide slide5-second-photo">
+  <h1>Крок 4: Друге фото</h1>
+  <p class="subtitle">5 хвилин минуло</p>
+
+  <div class="success-card">
+    <div class="success-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <h3><i class="fas fa-check"></i> Час вийшов!</h3>
+    <p>
+      Пройшло 5 хвилин з моменту першого фото. Зараз ви можете зробити друге
+      фото.
+    </p>
+
+    <button
+      class="action-button"
+      (click)="takeSecondPhoto()"
+      [disabled]="isCapturing || isProcessing || capturedSecondPhoto"
+    >
+      <i
+        class="fas"
+        [class.fa-camera]="!isProcessing"
+        [class.fa-spinner]="isProcessing"
+        [class.fa-spin]="isProcessing"
+      ></i>
+      <span>{{
+        isProcessing ? "Обробка..." : "Зафіксувати продовження порушення"
+      }}</span>
+    </button>
+
+    <!-- GPS Error Alert -->
+    <div class="gps-error-alert" *ngIf="gpsError">
+      <i class="fas fa-exclamation-triangle"></i>
+      <div class="error-content">
+        <strong>Помилка GPS</strong>
+        <p>
+          {{ gpsError }}. Перевірте дозволи для визначення місцеположення в
+          налаштуваннях браузера.
+        </p>
+      </div>
+    </div>
+
+    <div class="info-panel">
+      <div class="panel-icon">
+        <i class="fas fa-clipboard-list"></i>
+      </div>
+      <h4>Інформація:</h4>
+      <div class="info-row">
+        <span class="label">Час першого фото:</span>
+        <span
+          class="value"
+          *ngIf="session && session.firstPhoto && session.firstPhoto.timestamp"
+          >{{ formatTime(session.firstPhoto.timestamp) }}</span
+        >
+      </div>
+      <div class="info-row">
+        <span class="label">Поточний час:</span>
+        <span class="value">{{ formatTime(currentTime) }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Номер ТЗ:</span>
+        <span class="value">{{ session?.licensePlate || "AA 1234 BB" }}</span>
+      </div>
+      <div class="info-row highlight">
+        <span class="label">Тривалість:</span>
+        <span class="value">{{ calculateDuration() }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <i class="fas fa-info-circle"></i>
+    <strong>Порада:</strong> Зробіть фото під тим самим ракурсом
+  </div>
+</div>

@@ -1,0 +1,45 @@
+<div class="slide slide8-integration">
+  <div class="header-logos">
+    <div class="logo trident">
+      <i class="fas fa-landmark"></i>
+    </div>
+    <div class="logo dia">
+      <span>Дія</span>
+    </div>
+  </div>
+
+  <h1>Інтеграція в Дію</h1>
+  <p class="subtitle">Як працює сервіс у додатку</p>
+
+  <div class="steps-container">
+    <div
+      class="step-card"
+      *ngFor="let step of steps"
+      [style.border-left-color]="step.color"
+    >
+      <div class="step-number" [style.background]="step.color">
+        {{ step.number }}
+      </div>
+      <div class="step-content">
+        <div class="step-icon" [style.color]="step.color">
+          <i [class]="'fas fa-' + step.icon"></i>
+        </div>
+        <h3>{{ step.title }}</h3>
+        <p>{{ step.description }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="advantages-card">
+    <h4><i class="fas fa-star"></i> Переваги:</h4>
+    <p>
+      Швидка фіксація порушень, офіційне звернення з електронним підписом,
+      контроль за розглядом справи
+    </p>
+  </div>
+
+  <button class="view-status-button" (click)="viewStatus()">
+    <i class="fas fa-eye"></i>
+    <span>Переглянути статус заяви</span>
+  </button>
+</div>
