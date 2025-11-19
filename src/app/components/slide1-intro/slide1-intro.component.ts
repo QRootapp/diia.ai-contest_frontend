@@ -18,4 +18,8 @@ export class Slide1IntroComponent {
   startReport(): void {
     this.router.navigate(['/capture-first-photo']);
   }
+
+  viewMyApplications(): void {
+    this.router.navigate(['/my-applications']);
+  }
 }

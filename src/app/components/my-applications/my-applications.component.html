@@ -1,0 +1,66 @@
+<div class="slide my-applications">
+  <div class="header-logos">
+    <div class="logo trident">
+      <i class="fas fa-landmark"></i>
+    </div>
+    <div class="logo dia">
+      <span>Дія</span>
+    </div>
+  </div>
+
+  <h1>Мої заяви</h1>
+  <p class="subtitle">Історія поданих звернень</p>
+
+  <div class="applications-list" *ngIf="applications.length > 0">
+    <div
+      class="application-card"
+      *ngFor="let app of applications"
+      (click)="viewApplication(app)"
+    >
+      <div class="app-photo">
+        <img [src]="app.firstPhotoUrl" alt="Фото порушення" />
+      </div>
+
+      <div class="app-info">
+        <div class="app-header">
+          <span class="app-id">№ {{ app.caseId }}</span>
+          <span class="status-badge" [ngClass]="getStatusClass(app.status)">{{
+            getStatusLabel(app.status)
+          }}</span>
+        </div>
+
+        <div class="app-details">
+          <div class="detail-item">
+            <i class="fas fa-car"></i>
+            <span>{{ app.licensePlate }}</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-calendar"></i>
+            <span>{{ formatDate(app.submittedAt) }}</span>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-clock"></i>
+            <span>{{ formatTime(app.submittedAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="app-arrow">
+        <i class="fas fa-chevron-right"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="applications.length === 0">
+    <div class="empty-icon">
+      <i class="fas fa-inbox"></i>
+    </div>
+    <h3>Немає заяв</h3>
+    <p>Ви ще не подали жодної заяви про порушення</p>
+  </div>
+
+  <button class="new-report-button" (click)="startNewReport()">
+    <i class="fas fa-plus-circle"></i>
+    <span>Зафіксувати нове порушення</span>
+  </button>
+</div>

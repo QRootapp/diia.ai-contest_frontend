@@ -64,14 +64,39 @@ export class Slide7SubmissionComponent implements OnInit {
         this.stateService.setCaseStatus(caseStatus);
         this.stateService.updateSessionStatus('submitted');
 
-        // Auto-navigate to status page
-        this.router.navigate(['/status']);
+        // Save to localStorage for my applications list
+        this.saveToLocalStorage(caseStatus);
+
+        // Auto-navigate to status page with caseId
+        this.router.navigate(['/status', caseStatus.caseId]);
       },
       error: (error) => {
         console.error('Error submitting violation:', error);
         this.isSubmitting = false;
       },
     });
+  }
+
+  private saveToLocalStorage(caseStatus: any): void {
+    const application = {
+      id: caseStatus.caseId,
+      caseId: caseStatus.caseId,
+      licensePlate: caseStatus.licensePlate,
+      submittedAt: caseStatus.submittedAt,
+      status: caseStatus.status,
+      firstPhotoUrl: this.session?.firstPhoto?.imageData || '',
+      updates: caseStatus.updates || [],
+    };
+
+    // Get existing violations
+    const stored = localStorage.getItem('violations');
+    const violations = stored ? JSON.parse(stored) : [];
+
+    // Add new violation
+    violations.push(application);
+
+    // Save back to localStorage
+    localStorage.setItem('violations', JSON.stringify(violations));
   }
 
   formatTime(date: Date): string {

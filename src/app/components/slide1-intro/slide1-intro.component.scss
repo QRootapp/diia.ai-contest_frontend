@@ -61,8 +61,48 @@
   .subtitle {
     color: #666;
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     font-size: 0.95rem;
+  }
+
+  .my-applications-button {
+    width: 100%;
+    background: white;
+    border: 2px solid #4169e1;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #4169e1;
+    font-size: 1rem;
+    font-weight: 600;
+
+    > i:first-child {
+      font-size: 1.25rem;
+    }
+
+    span {
+      flex: 1;
+      text-align: left;
+    }
+
+    > i:last-child {
+      font-size: 1rem;
+      opacity: 0.6;
+    }
+
+    &:hover {
+      background: #e8f0fe;
+      box-shadow: 0 4px 12px rgba(65, 105, 225, 0.15);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
   }
 
   .info-card {
