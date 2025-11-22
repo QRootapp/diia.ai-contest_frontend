@@ -1,18 +1,13 @@
 <div class="slide slide1-intro">
-  <div class="top-bar">
-    <div class="tabs">
-      <button class="tab active">HANDOFFS</button>
-      <button class="tab">
-        <i class="fas fa-mobile-alt"></i>
-        Послуга
-      </button>
-    </div>
-    <div class="dia-logo">
-      <span>Дія</span>
-    </div>
-  </div>
-
   <div class="content-wrapper">
+    <button
+      class="my-applications-arrow"
+      type="button"
+      (click)="viewMyApplications()"
+      aria-label="Переглянути мої заяви"
+    >
+      <i class="fas fa-arrow-right"></i>
+    </button>
     <div class="icon-container">
       <div class="disability-icon">
         <i class="fas fa-wheelchair"></i>

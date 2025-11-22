@@ -2,7 +2,7 @@
   <h1>Крок 1: Фото фіксація</h1>
   <p class="subtitle">Зробіть фото автомобіля</p>
 
-  <div class="camera-container">
+  <div class="camera-container" *ngIf="!isPhotoAnalyzed">
     <div
       class="gps-status"
       [class.active]="isGpsActive"
@@ -40,14 +40,22 @@
         ? "Очікування GPS..."
         : isProcessing
         ? "Обробка..."
-        : isPhotoSubmitted
+        : isPhotoAnalyzed
         ? "Переробити фото"
         : "Зробити фото"
     }}</span>
   </button>
 
+  <div class="analysis-error" *ngIf="analysisError">
+    <i class="fas fa-exclamation-circle"></i>
+    <div class="error-content">
+      <strong>Помилка аналізу</strong>
+      <p>{{ analysisError }}</p>
+    </div>
+  </div>
+
   <!-- GPS Error Alert -->
-  <div class="gps-error-alert" *ngIf="gpsError && !isPhotoSubmitted">
+  <div class="gps-error-alert" *ngIf="gpsError && !isPhotoAnalyzed">
     <i class="fas fa-exclamation-triangle"></i>
     <div class="error-content">
       <strong>Помилка GPS</strong>
@@ -59,12 +67,15 @@
   </div>
 
   <!-- Photo preview after capture -->
-  <div class="photo-preview" *ngIf="capturedPhoto && isPhotoSubmitted">
+  <div class="photo-preview" *ngIf="capturedPhoto && isPhotoAnalyzed">
     <div class="preview-header">
       <i class="fas fa-check-circle"></i>
       <span>Фото успішно зроблено</span>
     </div>
-    <img [src]="capturedPhoto.imageData" alt="Captured photo" />
+    <img
+      [src]="capturedPhoto.photoUrl || capturedPhoto.previewUrl"
+      alt="Captured photo"
+    />
 
     <div class="photo-time-info">
       <i class="fas fa-clock"></i>
@@ -97,13 +108,32 @@
       </div>
     </div>
 
-    <button class="continue-button" (click)="proceedToValidation()">
+    <div class="analysis-info" *ngIf="capturedPhoto.analysis">
+      <div class="analysis-header">
+        <i class="fas fa-robot"></i>
+        <span>Аналіз ШІ</span>
+      </div>
+      <div class="analysis-content">
+        <div class="analysis-item">
+          <span class="label">Номерний знак:</span>
+          <span class="value badge">{{ capturedPhoto.analysis.plate }}</span>
+        </div>
+        <div class="analysis-item">
+          <span class="label">Ймовірність:</span>
+          <span class="value"
+            >{{ capturedPhoto.analysis.confidence.toFixed(0) }}%</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <button class="continue-button sticky-action" (click)="proceedToNextStep()">
       <span>Продовжити</span>
       <i class="fas fa-arrow-right"></i>
     </button>
   </div>
 
-  <div class="requirements-card" *ngIf="!isPhotoSubmitted">
+  <div class="requirements-card" *ngIf="!isPhotoAnalyzed">
     <div class="card-header">
       <i class="fas fa-camera"></i>
       <span>Спробуйте щоб у кадр потрапив:</span>
@@ -124,7 +154,7 @@
     </ul>
   </div>
 
-  <div class="parking-signs" *ngIf="!isPhotoSubmitted">
+  <div class="parking-signs" *ngIf="!isPhotoAnalyzed">
     <div class="sign-card">
       <div class="sign-icon parking">
         <span>P</span>
@@ -146,14 +176,16 @@
     </div>
   </div>
 
-  <div class="info-note" *ngIf="!isPhotoSubmitted">
+  <div class="info-note" *ngIf="!isPhotoAnalyzed">
     <i class="fas fa-info-circle"></i>
-    <h4>Знак "Водій з інвалідністю"</h4>
-    <p>
-      Квадрат синього кольору із стороною 150 мм і білим зображенням символу
-      таблички 7.17. Знак розміщується спереду і ззаду на механічних
-      транспортних засобах, якими керують водії з інвалідністю або водії, які
-      перевозять пасажирів з інвалідністю.
-    </p>
+    <div>
+      <h4>Знак "Водій з інвалідністю"</h4>
+      <p>
+        Квадрат синього кольору із стороною 150 мм і білим зображенням символу
+        таблички 7.17. Знак розміщується спереду і ззаду на механічних
+        транспортних засобах, якими керують водії з інвалідністю або водії, які
+        перевозять пасажирів з інвалідністю.
+      </p>
+    </div>
   </div>
 </div>

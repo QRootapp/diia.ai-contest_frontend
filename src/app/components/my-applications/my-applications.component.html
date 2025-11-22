@@ -1,66 +1,73 @@
 <div class="slide my-applications">
-  <div class="header-logos">
-    <div class="logo trident">
-      <i class="fas fa-landmark"></i>
-    </div>
-    <div class="logo dia">
+  <div class="top-bar">
+    <h2>Мої заяви</h2>
+    <div class="dia-logo">
       <span>Дія</span>
     </div>
   </div>
 
-  <h1>Мої заяви</h1>
-  <p class="subtitle">Історія поданих звернень</p>
+  <div class="content">
+    <p class="subtitle">Історія поданих звернень</p>
 
-  <div class="applications-list" *ngIf="applications.length > 0">
+    <div class="loading-state" *ngIf="isLoading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Завантаження...</span>
+    </div>
+
+    <div class="error-state" *ngIf="errorMessage">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+
     <div
-      class="application-card"
-      *ngFor="let app of applications"
-      (click)="viewApplication(app)"
+      class="applications-list"
+      *ngIf="!isLoading && !errorMessage && applications.length > 0"
     >
-      <div class="app-photo">
-        <img [src]="app.firstPhotoUrl" alt="Фото порушення" />
-      </div>
-
-      <div class="app-info">
-        <div class="app-header">
-          <span class="app-id">№ {{ app.caseId }}</span>
-          <span class="status-badge" [ngClass]="getStatusClass(app.status)">{{
-            getStatusLabel(app.status)
-          }}</span>
+      <div
+        class="application-card"
+        *ngFor="let app of applications"
+        (click)="viewApplication(app)"
+      >
+        <div class="app-icon">
+          <i class="fas fa-file-alt"></i>
         </div>
 
-        <div class="app-details">
-          <div class="detail-item">
-            <i class="fas fa-car"></i>
-            <span>{{ app.licensePlate }}</span>
+        <div class="app-info">
+          <div class="app-header">
+            <span class="app-id">Справа № {{ app.report_number }}</span>
+            <span class="status-badge" [ngClass]="getStatusClass(app.status)">{{
+              getStatusLabel(app.status)
+            }}</span>
           </div>
-          <div class="detail-item">
-            <i class="fas fa-calendar"></i>
-            <span>{{ formatDate(app.submittedAt) }}</span>
-          </div>
-          <div class="detail-item">
-            <i class="fas fa-clock"></i>
-            <span>{{ formatTime(app.submittedAt) }}</span>
+
+          <div class="app-details">
+            <div class="detail-row">
+              <span class="label">Номер ТЗ</span>
+              <span class="value">{{ app.vehicle_license_plate }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Подано</span>
+              <span class="value">{{ formatDate(app.created_at) }}</span>
+            </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="app-arrow">
-        <i class="fas fa-chevron-right"></i>
+    <div
+      class="empty-state"
+      *ngIf="!isLoading && !errorMessage && applications.length === 0"
+    >
+      <div class="empty-icon">
+        <i class="fas fa-inbox"></i>
       </div>
+      <h3>Немає заяв</h3>
+      <p>Ви ще не подали жодної заяви про порушення</p>
     </div>
-  </div>
 
-  <div class="empty-state" *ngIf="applications.length === 0">
-    <div class="empty-icon">
-      <i class="fas fa-inbox"></i>
-    </div>
-    <h3>Немає заяв</h3>
-    <p>Ви ще не подали жодної заяви про порушення</p>
+    <button class="new-report-button" (click)="startNewReport()">
+      <i class="fas fa-plus-circle"></i>
+      <span>Зафіксувати нове порушення</span>
+    </button>
   </div>
-
-  <button class="new-report-button" (click)="startNewReport()">
-    <i class="fas fa-plus-circle"></i>
-    <span>Зафіксувати нове порушення</span>
-  </button>
 </div>

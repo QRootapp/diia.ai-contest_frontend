@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { CaseStatus } from '../../models/violation.model';
+import { Report } from '../../models/violation.model';
 import { ViolationStateService } from '../../services/violation-state.service';
+import { ViolationApiService } from '../../services/violation-api.service';
 
 @Component({
   selector: 'app-slide9-status',
@@ -12,59 +13,60 @@ import { ViolationStateService } from '../../services/violation-state.service';
   styleUrls: ['./slide9-status.component.scss'],
 })
 export class Slide9StatusComponent implements OnInit {
-  caseStatus: CaseStatus | null = null;
-  caseId: string | null = null;
+  report: Report | null = null;
+  isLoading = false;
+  errorMessage: string | null = null;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private stateService: ViolationStateService
+    private stateService: ViolationStateService,
+    private apiService: ViolationApiService
   ) {}
 
   ngOnInit(): void {
-    // Get caseId from route params
     this.route.paramMap.subscribe((params) => {
-      this.caseId = params.get('caseId');
-      if (this.caseId) {
-        this.loadCaseById(this.caseId);
+      const idParam = params.get('caseId');
+      if (idParam) {
+        const reportId = Number(idParam);
+        if (isNaN(reportId)) {
+          this.errorMessage = 'Некоректний ідентифікатор звернення.';
+          return;
+        }
+        this.fetchReport(reportId);
       } else {
-        // Fallback to state service if no caseId in route
-        this.stateService.caseStatus$.subscribe({
-          next: (status) => {
-            this.caseStatus = status;
-          },
-        });
+        const sessionReport = this.stateService.getSession()?.backendReport;
+        if (sessionReport) {
+          this.report = sessionReport;
+        } else {
+          this.router.navigate(['/my-applications']);
+        }
       }
     });
   }
 
-  loadCaseById(caseId: string): void {
-    // Load case from localStorage
-    const stored = localStorage.getItem('violations');
-    if (stored) {
-      const allCases = JSON.parse(stored);
-      const foundCase = allCases.find((c: any) => c.caseId === caseId);
-      if (foundCase) {
-        this.caseStatus = {
-          ...foundCase,
-          submittedAt: new Date(foundCase.submittedAt),
-          updates:
-            foundCase.updates?.map((u: any) => ({
-              ...u,
-              timestamp: new Date(u.timestamp),
-            })) || [],
-        };
-      }
-    }
+  fetchReport(reportId: number): void {
+    this.isLoading = true;
+    this.apiService.getReportById(reportId).subscribe({
+      next: (report) => {
+        this.report = report;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Failed to load report status', error);
+        this.errorMessage = 'Не вдалося завантажити статус звернення.';
+        this.isLoading = false;
+      },
+    });
   }
 
   startNewReport(): void {
-    // Reset state and start over
     this.stateService.reset();
     this.router.navigate(['/my-applications']);
   }
 
-  formatDate(date: Date): string {
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
     return date.toLocaleDateString('uk-UA', {
       day: '2-digit',
       month: '2-digit',
@@ -72,14 +74,17 @@ export class Slide9StatusComponent implements OnInit {
     });
   }
 
-  formatTime(date: Date): string {
+  formatTime(dateString: string): string {
+    const date = new Date(dateString);
     return date.toLocaleTimeString('uk-UA', {
       hour: '2-digit',
       minute: '2-digit',
     });
   }
 
-  formatDateTime(date: Date): string {
-    return `${this.formatDate(date)} ${this.formatTime(date)}`;
+  getPhotoUrl(photoType: 'initial' | 'confirmation'): string | null {
+    if (!this.report) return null;
+    const photo = this.report.photos.find((p) => p.photo_type === photoType);
+    return photo?.photo_url || null;
   }
 }

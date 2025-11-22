@@ -3,7 +3,8 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import {
   ViolationSession,
   PhotoData,
-  CaseStatus,
+  ApplicantInfo,
+  Report,
 } from '../models/violation.model';
 
 @Injectable({
@@ -14,62 +15,78 @@ export class ViolationStateService {
   public session$: Observable<ViolationSession | null> =
     this.sessionSubject.asObservable();
 
-  private caseStatusSubject = new BehaviorSubject<CaseStatus | null>(null);
-  public caseStatus$: Observable<CaseStatus | null> =
-    this.caseStatusSubject.asObservable();
-
   constructor() {}
 
-  createSession(
-    firstPhoto: PhotoData,
-    sessionId: string,
-    licensePlate: string,
-    address: string
-  ): void {
+  startSession(firstPhoto: PhotoData): void {
     const session: ViolationSession = {
-      sessionId,
+      draftId: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
       firstPhoto,
-      licensePlate,
-      address,
-      status: 'pending',
+      status: 'draft',
     };
     this.sessionSubject.next(session);
   }
 
   addSecondPhoto(secondPhoto: PhotoData, duration: number): void {
     const currentSession = this.sessionSubject.value;
-    if (currentSession) {
-      currentSession.secondPhoto = secondPhoto;
-      currentSession.duration = duration;
-      currentSession.status = 'validated';
-      this.sessionSubject.next(currentSession);
-    }
+    if (!currentSession) return;
+    const updated: ViolationSession = {
+      ...currentSession,
+      secondPhoto,
+      duration,
+      status: 'ready',
+    };
+    this.sessionSubject.next(updated);
   }
 
-  updateSessionStatus(
-    status: 'pending' | 'validated' | 'submitted' | 'active'
-  ): void {
+  setApplicantInfo(applicant: ApplicantInfo): void {
     const currentSession = this.sessionSubject.value;
-    if (currentSession) {
-      currentSession.status = status;
-      this.sessionSubject.next(currentSession);
-    }
+    if (!currentSession) return;
+    const updated: ViolationSession = {
+      ...currentSession,
+      applicant,
+    };
+    this.sessionSubject.next(updated);
   }
 
-  setCaseStatus(status: CaseStatus): void {
-    this.caseStatusSubject.next(status);
+  setBackendReport(report: Report): void {
+    const currentSession = this.sessionSubject.value;
+    if (!currentSession) return;
+
+    const initialPhoto = report.photos.find(
+      (photo) => photo.photo_type === 'initial'
+    );
+    const confirmationPhoto = report.photos.find(
+      (photo) => photo.photo_type === 'confirmation'
+    );
+
+    const updated: ViolationSession = {
+      ...currentSession,
+      reportId: report.id,
+      reportNumber: report.report_number,
+      backendReport: report,
+      status: 'submitted',
+      firstPhoto: {
+        ...currentSession.firstPhoto,
+        photoUrl: initialPhoto?.photo_url ?? currentSession.firstPhoto.photoUrl,
+      },
+      secondPhoto: currentSession.secondPhoto
+        ? {
+            ...currentSession.secondPhoto,
+            photoUrl:
+              confirmationPhoto?.photo_url ??
+              currentSession.secondPhoto.photoUrl,
+          }
+        : currentSession.secondPhoto,
+    };
+
+    this.sessionSubject.next(updated);
   }
 
   getSession(): ViolationSession | null {
     return this.sessionSubject.value;
   }
 
-  getCaseStatus(): CaseStatus | null {
-    return this.caseStatusSubject.value;
-  }
-
   reset(): void {
     this.sessionSubject.next(null);
-    this.caseStatusSubject.next(null);
   }
 }

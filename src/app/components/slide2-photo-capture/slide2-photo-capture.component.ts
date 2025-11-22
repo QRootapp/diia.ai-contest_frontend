@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { CameraService } from '../../services/camera.service';
+import { CameraService, CapturedPhoto } from '../../services/camera.service';
 import { GeolocationService } from '../../services/geolocation.service';
 import { ViolationApiService } from '../../services/violation-api.service';
 import { ViolationStateService } from '../../services/violation-state.service';
-import { PhotoData } from '../../models/violation.model';
+import { PhotoData, PlateRecognition } from '../../models/violation.model';
 
 @Component({
   selector: 'app-slide2-photo-capture',
@@ -20,8 +20,9 @@ export class Slide2PhotoCaptureComponent {
   isProcessing = false;
   currentTime = new Date();
   capturedPhoto: PhotoData | null = null;
-  isPhotoSubmitted = false;
+  isPhotoAnalyzed = false;
   gpsError: string | null = null;
+  analysisError: string | null = null;
 
   constructor(
     private router: Router,
@@ -53,29 +54,25 @@ export class Slide2PhotoCaptureComponent {
   }
 
   openCamera(): void {
-    // Reset previous photo if retaking
-    if (this.isPhotoSubmitted) {
-      this.capturedPhoto = null;
-      this.isPhotoSubmitted = false;
-    }
-
+    this.resetPhotoState();
     this.cameraActive = true;
     this.cameraService.capturePhoto().subscribe({
-      next: (imageData) => {
+      next: (capture: CapturedPhoto) => {
         this.geoService.getCurrentPosition().subscribe({
           next: (location) => {
-            const photoData: PhotoData = {
-              imageData,
-              timestamp: new Date(),
-              geoLocation: location,
-              fileName: `photo_violation_${Date.now()}.jpg`,
-            };
             this.cameraActive = false;
             this.isProcessing = true;
             this.gpsError = null;
 
-            // Submit to API and navigate automatically
-            this.submitPhoto(photoData);
+            const photoData: PhotoData = {
+              previewUrl: capture.previewUrl,
+              file: capture.file,
+              timestamp: new Date(),
+              geoLocation: location,
+            };
+
+            this.capturedPhoto = photoData;
+            this.submitForAnalysis(photoData);
           },
           error: (error) => {
             console.error('GPS error during photo capture:', error);
@@ -93,31 +90,40 @@ export class Slide2PhotoCaptureComponent {
     });
   }
 
-  private submitPhoto(photoData: PhotoData): void {
-    this.capturedPhoto = photoData;
+  private submitForAnalysis(photoData: PhotoData): void {
+    if (!photoData.file) {
+      this.analysisError = 'Файл фото відсутній. Спробуйте ще раз.';
+      this.isProcessing = false;
+      return;
+    }
 
-    this.apiService.submitFirstPhoto(photoData).subscribe({
-      next: (response) => {
-        // Create session with validated data
-        this.stateService.createSession(
-          photoData,
-          response.sessionId,
-          response.licensePlate,
-          'вул. Хрещатик, 1'
-        );
-
+    this.apiService.checkPlate(photoData.file).subscribe({
+      next: (analysis: PlateRecognition) => {
+        photoData.analysis = analysis;
+        this.stateService.startSession(photoData);
         this.isProcessing = false;
-        this.isPhotoSubmitted = true;
+        this.isPhotoAnalyzed = true;
+        this.analysisError = null;
       },
       error: (error) => {
-        console.error('Error submitting first photo:', error);
+        console.error('Error analyzing first photo:', error);
+        this.analysisError =
+          'Не вдалося розпізнати номер. Спробуйте зробити фото ще раз.';
+        this.capturedPhoto = null;
         this.isProcessing = false;
+        this.isPhotoAnalyzed = false;
       },
     });
   }
 
-  proceedToValidation(): void {
-    this.router.navigate(['/validation']);
+  private resetPhotoState(): void {
+    this.capturedPhoto = null;
+    this.isPhotoAnalyzed = false;
+    this.analysisError = null;
+  }
+
+  proceedToNextStep(): void {
+    this.router.navigate(['/capture-second-photo']);
   }
 
   formatTime(date: Date): string {

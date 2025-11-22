@@ -1,11 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { CameraService } from '../../services/camera.service';
+import { CameraService, CapturedPhoto } from '../../services/camera.service';
 import { GeolocationService } from '../../services/geolocation.service';
 import { ViolationApiService } from '../../services/violation-api.service';
 import { ViolationStateService } from '../../services/violation-state.service';
-import { PhotoData, ViolationSession } from '../../models/violation.model';
+import {
+  PhotoData,
+  PlateRecognition,
+  ViolationSession,
+} from '../../models/violation.model';
 import { TimerService } from '../../services/timer.service';
 
 @Component({
@@ -15,13 +19,20 @@ import { TimerService } from '../../services/timer.service';
   templateUrl: './slide5-second-photo.component.html',
   styleUrls: ['./slide5-second-photo.component.scss'],
 })
-export class Slide5SecondPhotoComponent implements OnInit {
+export class Slide5SecondPhotoComponent implements OnInit, OnDestroy {
   session: ViolationSession | null = null;
   capturedSecondPhoto: PhotoData | null = null;
+  analysisError: string | null = null;
   isCapturing = false;
   isProcessing = false;
+  isPhotoAnalyzed = false;
   currentTime = new Date();
   gpsError: string | null = null;
+
+  timeRemaining = 5;
+  formattedTimer = '00:05';
+  progress = 0;
+  private timerInterval: any;
 
   constructor(
     private router: Router,
@@ -31,7 +42,6 @@ export class Slide5SecondPhotoComponent implements OnInit {
     private stateService: ViolationStateService,
     private timerService: TimerService
   ) {
-    // Update current time every second
     setInterval(() => {
       this.currentTime = new Date();
     }, 1000);
@@ -43,28 +53,68 @@ export class Slide5SecondPhotoComponent implements OnInit {
         this.session = session;
       },
     });
+    if (!this.session?.firstPhoto) {
+      this.router.navigate(['/capture-first-photo']);
+      return;
+    }
+    this.startTimer();
+  }
+
+  ngOnDestroy(): void {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+    }
+  }
+
+  startTimer(): void {
+    const totalTime = 5;
+    this.timeRemaining = totalTime;
+    this.formattedTimer = this.formatTimer(this.timeRemaining);
+
+    this.timerInterval = setInterval(() => {
+      if (this.timeRemaining > 0) {
+        this.timeRemaining--;
+        this.formattedTimer = this.formatTimer(this.timeRemaining);
+        this.progress = ((totalTime - this.timeRemaining) / totalTime) * 100;
+      } else {
+        clearInterval(this.timerInterval);
+      }
+    }, 1000);
+  }
+
+  formatTimer(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs
+      .toString()
+      .padStart(2, '0')}`;
   }
 
   takeSecondPhoto(): void {
-    if (!this.session) return;
+    if (!this.session?.firstPhoto) {
+      this.router.navigate(['/capture-first-photo']);
+      return;
+    }
 
     this.isCapturing = true;
+    this.analysisError = null;
+    this.capturedSecondPhoto = null;
     this.gpsError = null;
+    this.isPhotoAnalyzed = false;
+
     this.cameraService.capturePhoto().subscribe({
-      next: (imageData) => {
+      next: (capture: CapturedPhoto) => {
         this.geoService.getCurrentPosition().subscribe({
           next: (location) => {
             const photoData: PhotoData = {
-              imageData,
+              previewUrl: capture.previewUrl,
+              file: capture.file,
               timestamp: new Date(),
               geoLocation: location,
-              fileName: `photo_violation_${Date.now()}.jpg`,
             };
-            this.capturedSecondPhoto = photoData;
+
             this.isCapturing = false;
             this.isProcessing = true;
-
-            // Calculate duration and submit
             this.submitSecondPhoto(photoData);
           },
           error: (error) => {
@@ -83,29 +133,43 @@ export class Slide5SecondPhotoComponent implements OnInit {
   }
 
   private submitSecondPhoto(photoData: PhotoData): void {
-    if (!this.session) return;
+    if (!photoData.file) {
+      this.analysisError = 'Файл другого фото відсутній. Спробуйте ще раз.';
+      this.isProcessing = false;
+      return;
+    }
 
-    const duration = Math.floor(
-      (photoData.timestamp.getTime() -
-        this.session.firstPhoto.timestamp.getTime()) /
-        1000
-    );
+    this.apiService.checkPlate(photoData.file).subscribe({
+      next: (analysis: PlateRecognition) => {
+        photoData.analysis = analysis;
+        const durationSeconds = this.calculateDurationSeconds(photoData);
+        this.stateService.addSecondPhoto(photoData, durationSeconds);
 
-    this.apiService
-      .submitSecondPhoto(this.session.sessionId, photoData)
-      .subscribe({
-        next: (response) => {
-          // Update session with second photo
-          this.stateService.addSecondPhoto(photoData, duration);
+        this.capturedSecondPhoto = photoData;
+        this.isProcessing = false;
+        this.isPhotoAnalyzed = true;
+      },
+      error: (error) => {
+        console.error('Error analyzing second photo:', error);
+        this.analysisError =
+          'Не вдалося проаналізувати друге фото. Спробуйте ще раз.';
+        this.isProcessing = false;
+        this.isPhotoAnalyzed = false;
+        this.capturedSecondPhoto = null;
+      },
+    });
+  }
 
-          // Auto-navigate to review
-          this.router.navigate(['/review']);
-        },
-        error: (error) => {
-          console.error('Error submitting second photo:', error);
-          this.isProcessing = false;
-        },
-      });
+  private calculateDurationSeconds(photoData: PhotoData): number {
+    if (!this.session?.firstPhoto) return 0;
+    const diff =
+      photoData.timestamp.getTime() -
+      this.session.firstPhoto.timestamp.getTime();
+    return Math.max(0, Math.floor(diff / 1000));
+  }
+
+  proceedToReview(): void {
+    this.router.navigate(['/review']);
   }
 
   formatTime(date: Date): string {

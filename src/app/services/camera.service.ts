@@ -1,15 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Observable, from } from 'rxjs';
 
+export interface CapturedPhoto {
+  file: File;
+  previewUrl: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class CameraService {
   constructor() {}
 
-  capturePhoto(): Observable<string> {
+  capturePhoto(): Observable<CapturedPhoto> {
     return from(
-      new Promise<string>((resolve, reject) => {
+      new Promise<CapturedPhoto>((resolve, reject) => {
         // Check if we're on mobile with camera support
         if (this.isMobileDevice() && 'mediaDevices' in navigator) {
           this.captureFromCamera()
@@ -31,43 +36,47 @@ export class CameraService {
     );
   }
 
-  private captureFromCamera(): Promise<string> {
+  private captureFromCamera(): Promise<CapturedPhoto> {
     return new Promise((resolve, reject) => {
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*';
       input.capture = 'environment'; // Use back camera
 
-      input.onchange = (event: any) => {
-        const file = event.target.files[0];
-        if (file) {
-          this.fileToBase64(file).then(resolve).catch(reject);
-        } else {
-          reject('No file selected');
-        }
-      };
+      input.onchange = (event: any) =>
+        this.handleFileSelection(event, resolve, reject);
 
       input.click();
     });
   }
 
-  private captureFromFile(): Promise<string> {
+  private captureFromFile(): Promise<CapturedPhoto> {
     return new Promise((resolve, reject) => {
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*';
 
-      input.onchange = (event: any) => {
-        const file = event.target.files[0];
-        if (file) {
-          this.fileToBase64(file).then(resolve).catch(reject);
-        } else {
-          reject('No file selected');
-        }
-      };
+      input.onchange = (event: any) =>
+        this.handleFileSelection(event, resolve, reject);
 
       input.click();
     });
+  }
+
+  private handleFileSelection(
+    event: Event,
+    resolve: (value: CapturedPhoto | PromiseLike<CapturedPhoto>) => void,
+    reject: (reason?: any) => void
+  ) {
+    const target = event.target as HTMLInputElement;
+    const file = target?.files?.[0];
+    if (file) {
+      this.fileToBase64(file)
+        .then((previewUrl) => resolve({ file, previewUrl }))
+        .catch(reject);
+    } else {
+      reject('No file selected');
+    }
   }
 
   private fileToBase64(file: File): Promise<string> {

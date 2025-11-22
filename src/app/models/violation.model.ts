@@ -3,62 +3,73 @@ export interface GeoLocation {
   longitude: number;
 }
 
+export interface PlateRecognition {
+  plate: string;
+  confidence: number;
+}
+
 export interface PhotoData {
-  imageData: string; // base64 or blob URL
+  previewUrl: string;
+  file: File | null;
   timestamp: Date;
   geoLocation: GeoLocation;
-  fileName: string;
+  photoUrl?: string;
+  analysis?: PlateRecognition;
+}
+
+export interface ApplicantInfo {
+  firstName: string;
+  lastName: string;
+  middleName: string;
+  phone: string;
 }
 
 export interface ViolationSession {
-  sessionId: string;
+  draftId: string;
+  reportId?: number;
+  reportNumber?: string;
   firstPhoto: PhotoData;
   secondPhoto?: PhotoData;
-  licensePlate?: string;
-  address?: string;
-  status: 'pending' | 'validated' | 'submitted' | 'active';
-  duration?: number; // in seconds
+  status: 'draft' | 'ready' | 'submitted';
+  duration?: number; // seconds
+  applicant?: ApplicantInfo;
+  backendReport?: Report;
 }
 
-export interface SubmissionData {
-  sessionId: string;
-  userFullName: string;
-  userPhone: string;
-  licensePlate: string;
-  address: string;
-  violationDate: Date;
-  startTime: string;
-  endTime: string;
-  duration: number;
-  photos: PhotoData[];
-  gpsMetadata: GeoLocation;
+export interface ReportPhoto {
+  id: number;
+  photo_url: string;
+  photo_type: 'initial' | 'confirmation';
+  latitude: number | null;
+  longitude: number | null;
+  taken_at: string;
+  ocr_confidence: number | null;
+  recognized_plate: string | null;
+  created_at: string;
 }
 
-export interface AIValidationResponse {
-  sessionId: string;
-  licensePlate: string;
-  isValidViolation: boolean;
-  confidence: number;
-  violationType: string;
-  message: string;
+export interface Report {
+  id: number;
+  vehicle_license_plate: string;
+  latitude: number;
+  longitude: number;
+  status: 'draft' | 'submitted' | 'under_review' | 'resolved' | 'rejected';
+  first_photo_at: string;
+  confirmation_photo_at?: string;
+  duration_minutes?: number;
+  submitted_at?: string;
+  first_name: string;
+  last_name: string;
+  middle_name: string;
+  report_number: string;
+  created_at: string;
+  updated_at: string;
+  photos: ReportPhoto[];
 }
 
-export interface StatusUpdate {
-  status: string;
-  timestamp: Date;
-  description: string;
-  completed: boolean;
-}
-
-export interface CaseStatus {
-  caseId: string;
-  licensePlate: string;
-  submittedAt: Date;
-  status:
-    | 'active'
-    | 'under_review'
-    | 'decision_pending'
-    | 'resolution_issued'
-    | 'fine_applied';
-  updates: StatusUpdate[];
+export interface ReportsListResponse {
+  data: Report[];
+  total: number;
+  page: number;
+  limit: number;
 }

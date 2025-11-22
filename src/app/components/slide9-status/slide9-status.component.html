@@ -1,52 +1,78 @@
 <div class="slide slide9-status">
-  <div class="header-logos">
-    <div class="logo trident">
-      <i class="fas fa-landmark"></i>
+  <div class="top-bar">
+    <div class="back-button" (click)="startNewReport()">
+      <i class="fas fa-arrow-left"></i>
     </div>
-    <div class="logo dia">
+    <h2>Відстеження статусу</h2>
+    <div class="dia-logo">
       <span>Дія</span>
     </div>
   </div>
 
-  <h1>Відстеження статусу</h1>
-  <p class="subtitle">Моніторинг розгляду звернення</p>
+  <div class="content">
+    <p class="subtitle">Моніторинг розгляду звернення</p>
 
-  <div class="case-header" *ngIf="caseStatus">
-    <div class="case-id">
-      <span class="label">Заява №</span>
-      <span class="value">{{ caseStatus.caseId }}</span>
-    </div>
-    <span class="status-badge active">Активна</span>
-  </div>
-
-  <div class="case-info" *ngIf="caseStatus">
-    <div class="status-card success">
-      <div class="status-icon">
-        <i class="fas fa-check-circle"></i>
-      </div>
-      <h3>Заяву подано</h3>
-      <p>Ваша заява успішно відправлена до поліції</p>
+    <div class="loading-state" *ngIf="isLoading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Завантаження...</span>
     </div>
 
-    <div class="info-card">
-      <div class="info-row">
-        <span class="label">Подано</span>
-        <span class="value">{{ formatDateTime(caseStatus.submittedAt) }}</span>
+    <div class="error-state" *ngIf="errorMessage">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <div class="case-card" *ngIf="report && !isLoading && !errorMessage">
+      <div class="case-header">
+        <div class="case-id">
+          <span class="label">Справа №</span>
+          <span class="value">{{ report.report_number }}</span>
+        </div>
+        <span class="status-badge" [ngClass]="report.status">{{
+          report.status | titlecase
+        }}</span>
       </div>
-      <div class="info-row">
-        <span class="label">Номер ТЗ</span>
-        <span class="value">{{ caseStatus.licensePlate }}</span>
+
+      <div class="case-details">
+        <div class="detail-row">
+          <span class="label">Номерний знак</span>
+          <span class="value">{{ report.vehicle_license_plate }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Подано</span>
+          <span class="value">{{
+            formatDate(report.created_at) + " " + formatTime(report.created_at)
+          }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Статус</span>
+          <span class="value">{{ report.status | titlecase }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Заявник</span>
+          <span class="value"
+            >{{ report.last_name }} {{ report.first_name }}
+            {{ report.middle_name }}</span
+          >
+        </div>
+      </div>
+
+      <div class="photos-section" *ngIf="report.photos?.length">
+        <h4>Фото</h4>
+        <div class="photos-grid">
+          <div class="photo-card" *ngFor="let photo of report.photos">
+            <img [src]="photo.photo_url" [alt]="photo.photo_type" />
+            <div class="photo-meta">
+              <span class="photo-type">{{
+                photo.photo_type === "initial" ? "Перше фото" : "Підтвердження"
+              }}</span>
+              <span class="photo-time">{{
+                formatDate(photo.taken_at) + " " + formatTime(photo.taken_at)
+              }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-
-  <div class="info-footer" *ngIf="caseStatus">
-    <i class="fas fa-info-circle"></i>
-    <p>Ви отримаєте сповіщення, коли статус зміниться</p>
-  </div>
-
-  <button class="new-report-button" (click)="startNewReport()">
-    <i class="fas fa-arrow-left"></i>
-    <span>Повернутися до списку</span>
-  </button>
 </div>

@@ -141,6 +141,24 @@ button {
   margin-bottom: 2rem;
 }
 
+.sticky-action {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 2rem) !important;
+  max-width: 100% !important;
+  z-index: 999;
+  display: flex;
+  margin: 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+
+  @media (max-width: 768px) {
+    width: calc(100% - 3rem) !important;
+    bottom: 1.5rem;
+  }
+}
+
 /* Animations */
 @keyframes fadeIn {
   from {

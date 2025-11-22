@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ViolationSession } from '../../models/violation.model';
-import { GeolocationService } from '../../services/geolocation.service';
 import { ViolationStateService } from '../../services/violation-state.service';
 
 @Component({
@@ -17,7 +16,6 @@ export class Slide6ReviewComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private geoService: GeolocationService,
     private stateService: ViolationStateService
   ) {}
 
@@ -25,6 +23,9 @@ export class Slide6ReviewComponent implements OnInit {
     this.stateService.session$.subscribe({
       next: (session) => {
         this.session = session;
+        if (!session?.firstPhoto) {
+          this.router.navigate(['/capture-first-photo']);
+        }
       },
     });
   }

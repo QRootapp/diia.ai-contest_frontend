@@ -1,21 +1,97 @@
 <div class="slide slide7-submission">
-  <h1>Крок 6: Подача заяви</h1>
+  <h1>Крок 4: Подача заяви</h1>
   <p class="subtitle">Відправка до поліції</p>
 
   <div class="violation-details-section">
     <div class="section-header">
-      <i class="fas fa-file-alt"></i>
+      <div class="icon-wrapper">
+        <i class="fas fa-user"></i>
+      </div>
+      <span>Дані заявника</span>
+    </div>
+
+    <div class="applicant-form">
+      <div class="form-group">
+        <label for="lastName">Прізвище</label>
+        <input
+          type="text"
+          id="lastName"
+          [(ngModel)]="lastName"
+          placeholder="Введіть прізвище"
+          class="form-input"
+        />
+      </div>
+      <div class="form-group">
+        <label for="firstName">Імʼя</label>
+        <input
+          type="text"
+          id="firstName"
+          [(ngModel)]="firstName"
+          placeholder="Введіть імʼя"
+          class="form-input"
+        />
+      </div>
+      <div class="form-group">
+        <label for="middleName">По батькові</label>
+        <input
+          type="text"
+          id="middleName"
+          [(ngModel)]="middleName"
+          placeholder="Введіть по батькові"
+          class="form-input"
+        />
+      </div>
+      <div class="form-group">
+        <label for="phone">Телефон</label>
+        <input
+          type="tel"
+          id="phone"
+          [(ngModel)]="userPhone"
+          placeholder="+380 XX XXX XX XX"
+          class="form-input"
+        />
+      </div>
+      <div class="form-group">
+        <label for="plate">Номерний знак</label>
+        <input
+          type="text"
+          id="plate"
+          [(ngModel)]="vehiclePlate"
+          placeholder="AA 1234 BB"
+          class="form-input"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="form-error" *ngIf="errorMessage">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <div class="violation-details-section">
+    <div class="section-header">
+      <div class="icon-wrapper">
+        <i class="fas fa-file-alt"></i>
+      </div>
       <span>Деталі порушення</span>
     </div>
 
     <div class="details-card" *ngIf="session">
       <div class="detail-row">
         <span class="label">Номер ТЗ:</span>
-        <span class="value">{{ session.licensePlate }}</span>
+        <span class="value">{{ vehiclePlate || "---" }}</span>
       </div>
       <div class="detail-row">
-        <span class="label">Адреса:</span>
-        <span class="value">{{ session.address || "вул. Хрещатик, 1" }}</span>
+        <span class="label">Координати:</span>
+        <span class="value">{{
+          session.firstPhoto.geoLocation
+            ? formatCoordinates(
+                session.firstPhoto.geoLocation.latitude,
+                session.firstPhoto.geoLocation.longitude
+              )
+            : "---"
+        }}</span>
       </div>
       <div class="detail-row">
         <span class="label">Дата:</span>
@@ -36,21 +112,30 @@
       </div>
       <div class="detail-row highlight">
         <span class="label">Тривалість:</span>
-        <span class="value red">{{
-          formatDuration(session.duration || 300)
-        }}</span>
+        <span class="value">{{ formatDuration(session.duration || 300) }}</span>
       </div>
     </div>
   </div>
 
   <div class="materials-section">
     <div class="section-header">
-      <i class="fas fa-paperclip"></i>
-      <span>Додані матеріали:</span>
+      <div class="icon-wrapper">
+        <i class="fas fa-paperclip"></i>
+      </div>
+      <span>Додатки</span>
     </div>
 
     <div class="material-item">
-      <i class="fas fa-camera"></i>
+      <div class="material-thumb">
+        <img
+          *ngIf="session?.firstPhoto"
+          [src]="
+            session?.firstPhoto?.photoUrl || session?.firstPhoto?.previewUrl
+          "
+          alt="Перше фото"
+        />
+        <i class="fas fa-camera" *ngIf="!session?.firstPhoto"></i>
+      </div>
       <div class="material-info">
         <strong
           >Фото 1 ({{
@@ -59,50 +144,52 @@
               : "--:--:--"
           }})</strong
         >
-        <span class="small">GPS-мітка</span>
+        <span class="small"
+          >Ймовірність:
+          {{
+            formatConfidence(session?.firstPhoto?.analysis?.confidence)
+          }}</span
+        >
       </div>
       <i class="fas fa-check-circle checked"></i>
     </div>
 
-    <div class="material-item">
-      <i class="fas fa-camera"></i>
+    <div class="material-item" *ngIf="session?.secondPhoto">
+      <div class="material-thumb">
+        <img
+          *ngIf="session?.secondPhoto"
+          [src]="
+            session?.secondPhoto?.photoUrl || session?.secondPhoto?.previewUrl
+          "
+          alt="Друге фото"
+        />
+        <i class="fas fa-camera" *ngIf="!session?.secondPhoto"></i>
+      </div>
       <div class="material-info">
         <strong
           >Фото 2 ({{
-            session && session.secondPhoto
-              ? formatTime(session.secondPhoto.timestamp)
+            session?.secondPhoto?.timestamp
+              ? formatTime(session!.secondPhoto!.timestamp)
               : "--:--:--"
           }})</strong
         >
-        <span class="small">GPS-мітка</span>
+        <span class="small"
+          >Ймовірність:
+          {{
+            formatConfidence(session?.secondPhoto?.analysis?.confidence)
+          }}</span
+        >
       </div>
       <i class="fas fa-check-circle checked"></i>
     </div>
-
-    <div class="material-item">
-      <i class="fas fa-file-alt"></i>
-      <div class="material-info">
-        <strong>Метадані GPS</strong>
-      </div>
-      <i class="fas fa-check-circle checked"></i>
-    </div>
-  </div>
-
-  <div class="ready-card">
-    <i class="fas fa-check-circle"></i>
-    <span>Готово до відправки</span>
-  </div>
-
-  <div class="info-note">
-    <p>Всі дані перевірено. Зараз буде надправлена до поліції</p>
   </div>
 
   <button
-    class="submit-button"
+    class="submit-button sticky-action"
     (click)="onSubmit()"
-    [disabled]="isSubmitting || !isReadyToSubmit"
+    [disabled]="isSubmitting"
   >
-    <i class="fas fa-paper-plane"></i>
     <span>{{ isSubmitting ? "Відправка..." : "Відправити заяву" }}</span>
+    <i class="fas fa-arrow-right"></i>
   </button>
 </div>

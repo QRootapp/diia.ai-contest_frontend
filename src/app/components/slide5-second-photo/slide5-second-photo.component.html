@@ -1,75 +1,157 @@
 <div class="slide slide5-second-photo">
-  <h1>Крок 4: Друге фото</h1>
-  <p class="subtitle">5 хвилин минуло</p>
+  <h1>Крок 2: Друге фото</h1>
+  <p class="subtitle">Зробіть друге фото автомобіля</p>
 
-  <div class="success-card">
-    <div class="success-icon">
-      <i class="fas fa-check-circle"></i>
+  <div class="timer-section" *ngIf="timeRemaining > 0">
+    <div class="timer-display">
+      <i class="fas fa-clock"></i>
+      <span>{{ formattedTimer }}</span>
     </div>
-    <h3><i class="fas fa-check"></i> Час вийшов!</h3>
-    <p>
-      Пройшло 5 хвилин з моменту першого фото. Зараз ви можете зробити друге
-      фото.
-    </p>
+    <p>Зачекайте перед другим фото</p>
+    <div class="timer-note">5 секунд виставлено для швидкого тесту</div>
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="progress"></div>
+    </div>
+  </div>
 
-    <button
-      class="action-button"
-      (click)="takeSecondPhoto()"
-      [disabled]="isCapturing || isProcessing || capturedSecondPhoto"
-    >
-      <i
-        class="fas"
-        [class.fa-camera]="!isProcessing"
-        [class.fa-spinner]="isProcessing"
-        [class.fa-spin]="isProcessing"
-      ></i>
-      <span>{{
-        isProcessing ? "Обробка..." : "Зафіксувати продовження порушення"
-      }}</span>
-    </button>
+  <div class="camera-container" *ngIf="!isPhotoAnalyzed">
+    <div class="gps-status" [class.active]="!gpsError" [class.error]="gpsError">
+      <i class="fas fa-map-marker-alt"></i>
+      <span>{{ gpsError || "GPS: Активно" }}</span>
+    </div>
 
-    <!-- GPS Error Alert -->
-    <div class="gps-error-alert" *ngIf="gpsError">
-      <i class="fas fa-exclamation-triangle"></i>
-      <div class="error-content">
-        <strong>Помилка GPS</strong>
+    <div class="camera-preview" [class.active]="isCapturing">
+      <i class="fas fa-camera"></i>
+      <p>
+        {{
+          isCapturing
+            ? "Камера активна"
+            : "Зробіть друге фото під тим же ракурсом"
+        }}
+      </p>
+    </div>
+
+    <!-- Timestamp removed as requested -->
+  </div>
+
+  <button
+    class="capture-button"
+    (click)="takeSecondPhoto()"
+    [disabled]="
+      isCapturing || isProcessing || capturedSecondPhoto || timeRemaining > 0
+    "
+    *ngIf="!isPhotoAnalyzed"
+  >
+    <i
+      class="fas"
+      [class.fa-camera]="!isProcessing"
+      [class.fa-spinner]="isProcessing"
+      [class.fa-spin]="isProcessing"
+    ></i>
+    <span>{{
+      isProcessing
+        ? "Обробка..."
+        : timeRemaining > 0
+        ? "Зачекайте " + formattedTimer
+        : "Зробити друге фото"
+    }}</span>
+  </button>
+
+  <div class="analysis-error" *ngIf="analysisError">
+    <i class="fas fa-exclamation-circle"></i>
+    <div class="error-content">
+      <strong>Помилка аналізу</strong>
+      <p>{{ analysisError }}</p>
+    </div>
+  </div>
+
+  <!-- Photo preview after capture (Matching Slide 2 UI) -->
+  <div class="photo-preview" *ngIf="capturedSecondPhoto && isPhotoAnalyzed">
+    <div class="preview-header">
+      <i class="fas fa-check-circle"></i>
+      <span>Фото успішно зроблено</span>
+    </div>
+    <img
+      [src]="capturedSecondPhoto.photoUrl || capturedSecondPhoto.previewUrl"
+      alt="Captured second photo"
+    />
+
+    <div class="photo-time-info">
+      <i class="fas fa-clock"></i>
+      <div class="time-content">
+        <span class="time-label">Час фіксації:</span>
+        <span class="time-value">{{
+          formatTime(capturedSecondPhoto.timestamp)
+        }}</span>
+      </div>
+    </div>
+
+    <div class="location-info">
+      <div class="location-header">
+        <i class="fas fa-map-marker-alt"></i>
+        <span>Координати GPS</span>
+      </div>
+      <div class="location-details">
+        <div class="location-item">
+          <span class="label">Широта:</span>
+          <span class="value"
+            >{{ capturedSecondPhoto.geoLocation.latitude.toFixed(6) }}°</span
+          >
+        </div>
+        <div class="location-item">
+          <span class="label">Довгота:</span>
+          <span class="value"
+            >{{ capturedSecondPhoto.geoLocation.longitude.toFixed(6) }}°</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="analysis-info" *ngIf="capturedSecondPhoto.analysis">
+      <div class="analysis-header">
+        <i class="fas fa-robot"></i>
+        <span>Аналіз ШІ</span>
+      </div>
+      <div class="analysis-content">
+        <div class="analysis-item">
+          <span class="label">Номерний знак:</span>
+          <span class="value badge">{{
+            capturedSecondPhoto.analysis.plate
+          }}</span>
+        </div>
+        <div class="analysis-item">
+          <span class="label">Ймовірність:</span>
+          <span class="value"
+            >{{ capturedSecondPhoto.analysis.confidence.toFixed(0) }}%</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-icon">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div class="card-content">
+        <h4>Тривалість порушення</h4>
         <p>
-          {{ gpsError }}. Перевірте дозволи для визначення місцеположення в
-          налаштуваннях браузера.
+          Пройшло <strong>{{ calculateDuration() }}</strong> з моменту першого
+          фото
         </p>
       </div>
     </div>
 
-    <div class="info-panel">
-      <div class="panel-icon">
-        <i class="fas fa-clipboard-list"></i>
-      </div>
-      <h4>Інформація:</h4>
-      <div class="info-row">
-        <span class="label">Час першого фото:</span>
-        <span
-          class="value"
-          *ngIf="session && session.firstPhoto && session.firstPhoto.timestamp"
-          >{{ formatTime(session.firstPhoto.timestamp) }}</span
-        >
-      </div>
-      <div class="info-row">
-        <span class="label">Поточний час:</span>
-        <span class="value">{{ formatTime(currentTime) }}</span>
-      </div>
-      <div class="info-row">
-        <span class="label">Номер ТЗ:</span>
-        <span class="value">{{ session?.licensePlate || "AA 1234 BB" }}</span>
-      </div>
-      <div class="info-row highlight">
-        <span class="label">Тривалість:</span>
-        <span class="value">{{ calculateDuration() }}</span>
-      </div>
-    </div>
+    <button class="continue-button sticky-action" (click)="proceedToReview()">
+      <span>Перейти до підсумків</span>
+      <i class="fas fa-arrow-right"></i>
+    </button>
   </div>
 
-  <div class="tip-card">
+  <div class="tip-card" *ngIf="!isPhotoAnalyzed">
     <i class="fas fa-info-circle"></i>
-    <strong>Порада:</strong> Зробіть фото під тим самим ракурсом
+    <p>
+      <strong>Порада:</strong> Зробіть фото під тим самим ракурсом для кращої
+      фіксації
+    </p>
   </div>
 </div>

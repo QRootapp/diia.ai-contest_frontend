@@ -1,20 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-
-interface Application {
-  id: string;
-  caseId: string;
-  licensePlate: string;
-  submittedAt: Date;
-  status:
-    | 'active'
-    | 'under_review'
-    | 'decision_pending'
-    | 'resolution_issued'
-    | 'fine_applied';
-  firstPhotoUrl: string;
-}
+import { ViolationApiService } from '../../services/violation-api.service';
+import { Report } from '../../models/violation.model';
 
 @Component({
   selector: 'app-my-applications',
@@ -24,39 +12,50 @@ interface Application {
   styleUrls: ['./my-applications.component.scss'],
 })
 export class MyApplicationsComponent implements OnInit {
-  applications: Application[] = [];
+  applications: Report[] = [];
+  isLoading = false;
+  errorMessage: string | null = null;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private apiService: ViolationApiService
+  ) {}
 
   ngOnInit(): void {
-    // Load applications from localStorage
     this.loadApplications();
   }
 
   loadApplications(): void {
-    const stored = localStorage.getItem('violations');
-    if (stored) {
-      const allApplications = JSON.parse(stored);
-      this.applications = allApplications.map((app: any) => ({
-        ...app,
-        submittedAt: new Date(app.submittedAt),
-      }));
-      // Sort by date descending (newest first)
-      this.applications.sort(
-        (a, b) => b.submittedAt.getTime() - a.submittedAt.getTime()
-      );
-    }
+    this.isLoading = true;
+    console.log(
+      '[MyApplications] Loading reports from backend:',
+      this.apiService['baseUrl'] || 'GET /reports'
+    );
+    this.apiService.getReports(1, 20).subscribe({
+      next: (response) => {
+        console.log('[MyApplications] Reports loaded:', response);
+        this.applications = response.data;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Failed to load reports', error);
+        this.errorMessage =
+          'Не вдалося завантажити ваші звернення. Спробуйте пізніше.';
+        this.isLoading = false;
+      },
+    });
   }
 
-  viewApplication(app: Application): void {
-    this.router.navigate(['/status', app.caseId]);
+  viewApplication(app: Report): void {
+    this.router.navigate(['/status', app.id]);
   }
 
   startNewReport(): void {
     this.router.navigate(['/capture-first-photo']);
   }
 
-  formatDate(date: Date): string {
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
     return date.toLocaleDateString('uk-UA', {
       day: '2-digit',
       month: '2-digit',
@@ -64,7 +63,8 @@ export class MyApplicationsComponent implements OnInit {
     });
   }
 
-  formatTime(date: Date): string {
+  formatTime(dateString: string): string {
+    const date = new Date(dateString);
     return date.toLocaleTimeString('uk-UA', {
       hour: '2-digit',
       minute: '2-digit',
@@ -73,22 +73,22 @@ export class MyApplicationsComponent implements OnInit {
 
   getStatusLabel(status: string): string {
     const labels: { [key: string]: string } = {
-      active: 'Активна',
+      draft: 'Чернетка',
+      submitted: 'Надіслано',
       under_review: 'На розгляді',
-      decision_pending: 'Очікує рішення',
-      resolution_issued: 'Рішення прийнято',
-      fine_applied: 'Штраф застосовано',
+      resolved: 'Вирішено',
+      rejected: 'Відхилено',
     };
-    return labels[status] || 'Невідомо';
+    return labels[status] || status;
   }
 
   getStatusClass(status: string): string {
     const classes: { [key: string]: string } = {
-      active: 'status-active',
+      draft: 'status-active',
+      submitted: 'status-review',
       under_review: 'status-review',
-      decision_pending: 'status-pending',
-      resolution_issued: 'status-resolved',
-      fine_applied: 'status-fined',
+      resolved: 'status-resolved',
+      rejected: 'status-fined',
     };
     return classes[status] || 'status-active';
   }

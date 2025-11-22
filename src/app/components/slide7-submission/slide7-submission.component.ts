@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ViolationSession, SubmissionData } from '../../models/violation.model';
+import { ApplicantInfo, ViolationSession } from '../../models/violation.model';
 import { ViolationApiService } from '../../services/violation-api.service';
 import { ViolationStateService } from '../../services/violation-state.service';
 
@@ -15,11 +15,14 @@ import { ViolationStateService } from '../../services/violation-state.service';
 })
 export class Slide7SubmissionComponent implements OnInit {
   session: ViolationSession | null = null;
-  userFullName = 'Іваненко Петро Михайлович';
-  userPhone = '+380 67 123 45 67';
+  firstName = '';
+  lastName = '';
+  middleName = '';
+  userPhone = '';
+  vehiclePlate = '';
 
   isSubmitting = false;
-  isReadyToSubmit = true;
+  errorMessage: string | null = null;
 
   constructor(
     private router: Router,
@@ -31,72 +34,133 @@ export class Slide7SubmissionComponent implements OnInit {
     this.stateService.session$.subscribe({
       next: (session) => {
         this.session = session;
+        if (!session?.firstPhoto || !session.secondPhoto) {
+          this.router.navigate(['/capture-first-photo']);
+          return;
+        }
+        const detectedPlate =
+          session.secondPhoto.analysis?.plate ||
+          session.firstPhoto.analysis?.plate ||
+          '';
+        this.vehiclePlate = detectedPlate;
+        if (session.applicant) {
+          this.patchApplicant(session.applicant);
+        }
       },
     });
   }
 
   onSubmit(): void {
-    if (!this.session || !this.isReadyToSubmit) return;
+    if (
+      !this.session ||
+      !this.session.firstPhoto ||
+      !this.session.secondPhoto
+    ) {
+      this.errorMessage = 'Зробіть обидва фото перед подачею заяви.';
+      return;
+    }
 
-    const submissionData: SubmissionData = {
-      sessionId: this.session.sessionId,
-      userFullName: this.userFullName,
-      userPhone: this.userPhone,
-      licensePlate: this.session.licensePlate || '',
-      address: this.session.address || 'вул. Хрещатик, 1',
-      violationDate: this.session.firstPhoto.timestamp,
-      startTime: this.formatTime(this.session.firstPhoto.timestamp),
-      endTime: this.session.secondPhoto
-        ? this.formatTime(this.session.secondPhoto.timestamp)
-        : '',
-      duration: this.session.duration || 300,
-      photos: [
-        this.session.firstPhoto,
-        ...(this.session.secondPhoto ? [this.session.secondPhoto] : []),
-      ],
-      gpsMetadata: this.session.firstPhoto.geoLocation,
+    if (!this.firstName || !this.lastName || !this.middleName) {
+      this.errorMessage = 'Заповніть ПІБ заявника.';
+      return;
+    }
+
+    if (!this.vehiclePlate) {
+      this.errorMessage = 'Вкажіть номерний знак транспортного засобу.';
+      return;
+    }
+
+    if (!this.session.firstPhoto.file || !this.session.secondPhoto.file) {
+      this.errorMessage =
+        'Вихідні файли фото відсутні. Будь ласка, зробіть фото повторно.';
+      return;
+    }
+
+    this.errorMessage = null;
+    const applicant: ApplicantInfo = {
+      firstName: this.firstName,
+      lastName: this.lastName,
+      middleName: this.middleName,
+      phone: this.userPhone,
+    };
+    this.stateService.setApplicantInfo(applicant);
+
+    const createPayload = {
+      latitude: this.session.firstPhoto.geoLocation.latitude,
+      longitude: this.session.firstPhoto.geoLocation.longitude,
+      createdAt: this.session.firstPhoto.timestamp,
+      vehicleLicensePlate: this.vehiclePlate.trim().toUpperCase(),
+      firstName: this.firstName,
+      lastName: this.lastName,
+      middleName: this.middleName,
+      confidence: this.session.firstPhoto.analysis?.confidence || 0,
+      file: this.session.firstPhoto.file!,
     };
 
     this.isSubmitting = true;
 
-    this.apiService.submitViolation(submissionData).subscribe({
-      next: (caseStatus) => {
-        this.stateService.setCaseStatus(caseStatus);
-        this.stateService.updateSessionStatus('submitted');
-
-        // Save to localStorage for my applications list
-        this.saveToLocalStorage(caseStatus);
-
-        // Auto-navigate to status page with caseId
-        this.router.navigate(['/status', caseStatus.caseId]);
+    this.apiService.createReport(createPayload).subscribe({
+      next: (report) => {
+        this.submitConfirmationPhoto(report.id);
       },
       error: (error) => {
-        console.error('Error submitting violation:', error);
+        console.error('Error creating report:', error);
+        this.errorMessage =
+          'Не вдалося створити заяву. Перевірте дані та спробуйте ще раз.';
         this.isSubmitting = false;
       },
     });
   }
 
-  private saveToLocalStorage(caseStatus: any): void {
-    const application = {
-      id: caseStatus.caseId,
-      caseId: caseStatus.caseId,
-      licensePlate: caseStatus.licensePlate,
-      submittedAt: caseStatus.submittedAt,
-      status: caseStatus.status,
-      firstPhotoUrl: this.session?.firstPhoto?.imageData || '',
-      updates: caseStatus.updates || [],
+  private submitConfirmationPhoto(reportId: number): void {
+    if (!this.session?.secondPhoto || !this.session.secondPhoto.file) {
+      this.errorMessage =
+        'Не вдалося знайти друге фото. Будь ласка, повторіть крок.';
+      this.isSubmitting = false;
+      return;
+    }
+
+    const updatePayload = {
+      latitude: this.session.secondPhoto.geoLocation.latitude,
+      longitude: this.session.secondPhoto.geoLocation.longitude,
+      createdAt: this.session.secondPhoto.timestamp,
+      durationMinutes: this.calculateDurationMinutes(),
+      vehicleLicensePlate:
+        this.session.secondPhoto.analysis?.plate ||
+        this.session.firstPhoto.analysis?.plate ||
+        this.vehiclePlate.trim().toUpperCase(),
+      confidence:
+        this.session.secondPhoto.analysis?.confidence ||
+        this.session.firstPhoto.analysis?.confidence ||
+        0,
+      file: this.session.secondPhoto.file!,
     };
 
-    // Get existing violations
-    const stored = localStorage.getItem('violations');
-    const violations = stored ? JSON.parse(stored) : [];
+    this.apiService.updateReport(reportId, updatePayload).subscribe({
+      next: (updatedReport) => {
+        this.stateService.setBackendReport(updatedReport);
+        this.isSubmitting = false;
+        this.router.navigate(['/status', updatedReport.id]);
+      },
+      error: (error) => {
+        console.error('Error updating report:', error);
+        this.errorMessage =
+          'Не вдалося додати друге фото. Спробуйте ще раз або перестворіть заяву.';
+        this.isSubmitting = false;
+      },
+    });
+  }
 
-    // Add new violation
-    violations.push(application);
+  private patchApplicant(applicant: ApplicantInfo): void {
+    this.firstName = applicant.firstName;
+    this.lastName = applicant.lastName;
+    this.middleName = applicant.middleName;
+    this.userPhone = applicant.phone;
+  }
 
-    // Save back to localStorage
-    localStorage.setItem('violations', JSON.stringify(violations));
+  private calculateDurationMinutes(): number {
+    const seconds = this.session?.duration || 0;
+    return Math.max(1, Math.ceil(seconds / 60));
   }
 
   formatTime(date: Date): string {
@@ -112,7 +176,14 @@ export class Slide7SubmissionComponent implements OnInit {
 
   formatDuration(seconds: number): string {
     const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
     return `${mins} хвилин`;
+  }
+
+  formatCoordinates(lat: number, lon: number): string {
+    return `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+  }
+
+  formatConfidence(value?: number): string {
+    return value ? `${(value * 100).toFixed(0)}%` : '---';
   }
 }

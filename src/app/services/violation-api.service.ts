@@ -1,145 +1,120 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
 import {
-  PhotoData,
-  AIValidationResponse,
-  ViolationSession,
-  SubmissionData,
-  CaseStatus,
-  StatusUpdate,
+  PlateRecognition,
+  Report,
+  ReportsListResponse,
 } from '../models/violation.model';
+import { environment } from '../../environments/environment';
+
+interface CreateReportRequest {
+  latitude: number;
+  longitude: number;
+  createdAt: Date;
+  vehicleLicensePlate: string;
+  firstName: string;
+  lastName: string;
+  middleName: string;
+  confidence: number;
+  file: File;
+}
+
+interface UpdateReportRequest {
+  latitude: number;
+  longitude: number;
+  createdAt: Date;
+  durationMinutes: number;
+  vehicleLicensePlate: string;
+  confidence: number;
+  file: File;
+}
+
+interface ReportsListResponseRaw {
+  data: any[];
+  total: number;
+  page: number;
+  limit: number;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class ViolationApiService {
-  private mockSessionId = '';
+  private readonly baseUrl = `${environment.apiUrl}/reports`;
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
-  // Submit first photo and create session
-  submitFirstPhoto(photoData: PhotoData): Observable<AIValidationResponse> {
-    this.mockSessionId = this.generateSessionId();
-
-    // Mock AI response
-    const mockResponse: AIValidationResponse = {
-      sessionId: this.mockSessionId,
-      licensePlate: 'AA 1234 BB',
-      isValidViolation: true,
-      confidence: 0.95,
-      violationType: 'Порушення паркування для осіб з інвалідністю',
-      message: 'Номерний знак AA 1234 BB розпізнано успішно',
-    };
-
-    // Simulate API delay
-    return of(mockResponse).pipe(delay(2000));
+  checkPlate(file: File): Observable<PlateRecognition> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<PlateRecognition>(
+      `${this.baseUrl}/check-plate`,
+      formData
+    );
   }
 
-  // Submit second photo (PATCH)
-  submitSecondPhoto(
-    sessionId: string,
-    photoData: PhotoData
-  ): Observable<AIValidationResponse> {
-    const mockResponse: AIValidationResponse = {
-      sessionId: sessionId,
-      licensePlate: 'AA 1234 BB',
-      isValidViolation: true,
-      confidence: 0.97,
-      violationType: 'Порушення паркування для осіб з інвалідністю',
-      message: 'Друге фото підтверджує порушення',
-    };
+  createReport(payload: CreateReportRequest): Observable<Report> {
+    const formData = new FormData();
+    formData.append('file', payload.file);
+    formData.append('latitude', payload.latitude.toString());
+    formData.append('longitude', payload.longitude.toString());
+    formData.append('createdAt', payload.createdAt.toISOString());
+    formData.append('vehicleLicensePlate', payload.vehicleLicensePlate);
+    formData.append('firstName', payload.firstName);
+    formData.append('lastName', payload.lastName);
+    formData.append('middleName', payload.middleName);
+    formData.append('confidence', payload.confidence.toString());
 
-    return of(mockResponse).pipe(delay(1500));
+    return this.http
+      .post<Report>(this.baseUrl, formData)
+      .pipe(map((report) => this.normalizeReport(report)));
   }
 
-  // Submit complete violation report
-  submitViolation(data: SubmissionData): Observable<CaseStatus> {
-    const caseId = `2024-11-17-${Math.floor(Math.random() * 1000)
-      .toString()
-      .padStart(3, '0')}`;
+  updateReport(
+    reportId: number,
+    payload: UpdateReportRequest
+  ): Observable<Report> {
+    const formData = new FormData();
+    formData.append('file', payload.file);
+    formData.append('latitude', payload.latitude.toString());
+    formData.append('longitude', payload.longitude.toString());
+    formData.append('createdAt', payload.createdAt.toISOString());
+    formData.append('durationMinutes', payload.durationMinutes.toString());
+    formData.append('vehicleLicensePlate', payload.vehicleLicensePlate);
+    formData.append('confidence', payload.confidence.toString());
 
-    const mockStatus: CaseStatus = {
-      caseId: caseId,
-      licensePlate: data.licensePlate,
-      submittedAt: new Date(),
-      status: 'active',
-      updates: [
-        {
-          status: 'Прийнято до розгляду',
-          timestamp: new Date(),
-          description:
-            'Звернення зареєстровано в системі МВС та передано до відповідного підрозділу',
-          completed: true,
-        },
-        {
-          status: 'На розгляді',
-          timestamp: new Date(Date.now() + 120000),
-          description: 'Інспектор Іванов О.П. розглядає матеріали справи',
-          completed: true,
-        },
-        {
-          status: 'Винесення постанови',
-          timestamp: new Date(),
-          description:
-            'Очікується. Після перевірки доказів буде винесено рішення',
-          completed: false,
-        },
-        {
-          status: 'Постанова винесена',
-          timestamp: new Date(),
-          description: 'Очікується',
-          completed: false,
-        },
-        {
-          status: 'Накладено штраф',
-          timestamp: new Date(),
-          description: 'Очікується',
-          completed: false,
-        },
-      ],
-    };
-
-    return of(mockStatus).pipe(delay(2500));
+    return this.http
+      .patch<Report>(`${this.baseUrl}/${reportId}`, formData)
+      .pipe(map((report) => this.normalizeReport(report)));
   }
 
-  // Get case status
-  getCaseStatus(caseId: string): Observable<CaseStatus> {
-    // Mock status retrieval
-    const mockStatus: CaseStatus = {
-      caseId: caseId,
-      licensePlate: 'AA 1234 BB',
-      submittedAt: new Date('2024-11-17T14:38:22'),
-      status: 'under_review',
-      updates: [
-        {
-          status: 'Прийнято до розгляду',
-          timestamp: new Date('2024-11-17T14:40:15'),
-          description:
-            'Звернення зареєстровано в системі МВС та передано до відповідного підрозділу',
-          completed: true,
-        },
-        {
-          status: 'На розгляді',
-          timestamp: new Date('2024-11-17T15:20:30'),
-          description: 'Інспектор Іванов О.П. розглядає матеріали справи',
-          completed: true,
-        },
-        {
-          status: 'Винесення постанови',
-          timestamp: new Date(),
-          description:
-            'Очікується. Після перевірки доказів буде винесено рішення',
-          completed: false,
-        },
-      ],
-    };
-
-    return of(mockStatus).pipe(delay(1000));
+  getReports(page = 1, limit = 10): Observable<ReportsListResponse> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+    return this.http.get<ReportsListResponseRaw>(this.baseUrl, { params }).pipe(
+      map((response) => ({
+        ...response,
+        data: response.data.map((report) => this.normalizeReport(report)),
+      }))
+    );
   }
 
-  private generateSessionId(): string {
-    const timestamp = Date.now();
-    const random = Math.floor(Math.random() * 10000);
-    return `SESSION-${timestamp}-${random}`;
+  getReportById(id: number): Observable<Report> {
+    return this.http
+      .get<Report>(`${this.baseUrl}/${id}`)
+      .pipe(map((report) => this.normalizeReport(report)));
+  }
+
+  private normalizeReport(report: any): Report {
+    const photos =
+      typeof report.photos === 'string'
+        ? JSON.parse(report.photos || '[]')
+        : report.photos || [];
+    return {
+      ...report,
+      photos,
+    };
   }
 }
