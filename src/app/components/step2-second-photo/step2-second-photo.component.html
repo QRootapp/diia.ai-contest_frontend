@@ -45,8 +45,7 @@
   <button
     class="capture-button"
     (click)="takeSecondPhoto()"
-    [disabled]="isProcessing || capturedSecondPhoto || timeRemaining > 0"
-    *ngIf="!isPhotoAnalyzed"
+    [disabled]="isProcessing || timeRemaining > 0"
   >
     <i
       class="fas"
@@ -59,6 +58,8 @@
         ? "Обробка..."
         : timeRemaining > 0
         ? "Зачекайте " + formattedTimer
+        : isPhotoAnalyzed
+        ? "Перезняти фото"
         : "Зробити друге фото"
     }}</span>
   </button>

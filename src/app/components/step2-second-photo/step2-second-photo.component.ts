@@ -145,6 +145,14 @@ export class Slide5SecondPhotoComponent implements OnInit, OnDestroy {
 
     this.apiService.checkPlate(photoData.file).subscribe({
       next: (analysis: PlateRecognition) => {
+        if (!analysis.plate || analysis.confidence === null) {
+          this.analysisError = 'Не вдалося розпізнати номерні знаки';
+          this.capturedSecondPhoto = null;
+          this.isProcessing = false;
+          this.isPhotoAnalyzed = false;
+          return;
+        }
+
         photoData.analysis = analysis;
         const durationSeconds = this.calculateDurationSeconds(photoData);
         this.stateService.addSecondPhoto(photoData, durationSeconds);

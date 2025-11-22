@@ -96,6 +96,14 @@ export class Slide2PhotoCaptureComponent {
 
     this.apiService.checkPlate(photoData.file).subscribe({
       next: (analysis: PlateRecognition) => {
+        if (!analysis.plate || analysis.confidence === null) {
+          this.analysisError = 'Не вдалося розпізнати номерні знаки';
+          this.capturedPhoto = null;
+          this.isProcessing = false;
+          this.isPhotoAnalyzed = false;
+          return;
+        }
+
         photoData.analysis = analysis;
         this.stateService.startSession(photoData);
         this.isProcessing = false;
