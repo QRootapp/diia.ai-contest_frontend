@@ -18,7 +18,6 @@ export class Slide2PhotoCaptureComponent {
   isGpsActive = false;
   cameraActive = false;
   isProcessing = false;
-  currentTime = new Date();
   capturedPhoto: PhotoData | null = null;
   isPhotoAnalyzed = false;
   gpsError: string | null = null;
@@ -31,11 +30,6 @@ export class Slide2PhotoCaptureComponent {
     private apiService: ViolationApiService,
     private stateService: ViolationStateService
   ) {
-    // Update time every second
-    setInterval(() => {
-      this.currentTime = new Date();
-    }, 1000);
-
     // Get GPS status
     this.checkGPS();
   }
