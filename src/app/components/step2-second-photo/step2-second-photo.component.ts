@@ -23,6 +23,7 @@ export class Slide5SecondPhotoComponent implements OnInit, OnDestroy {
   session: ViolationSession | null = null;
   capturedSecondPhoto: PhotoData | null = null;
   analysisError: string | null = null;
+  captureError: string | null = null;
   isCapturing = false;
   isProcessing = false;
   isPhotoAnalyzed = false;
@@ -98,6 +99,7 @@ export class Slide5SecondPhotoComponent implements OnInit, OnDestroy {
 
     this.isCapturing = true;
     this.analysisError = null;
+    this.captureError = null;
     this.capturedSecondPhoto = null;
     this.gpsError = null;
     this.isPhotoAnalyzed = false;
@@ -128,6 +130,8 @@ export class Slide5SecondPhotoComponent implements OnInit, OnDestroy {
       error: (error) => {
         console.error('Camera error:', error);
         this.isCapturing = false;
+        this.captureError =
+          typeof error === 'string' ? error : 'Помилка камери';
       },
     });
   }

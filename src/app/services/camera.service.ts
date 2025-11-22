@@ -71,6 +71,10 @@ export class CameraService {
     const target = event.target as HTMLInputElement;
     const file = target?.files?.[0];
     if (file) {
+      if (file.size > 20 * 1024 * 1024) {
+        reject('Розмір файлу перевищує 20 МБ');
+        return;
+      }
       this.fileToBase64(file)
         .then((previewUrl) => resolve({ file, previewUrl }))
         .catch(reject);

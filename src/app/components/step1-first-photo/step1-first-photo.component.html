@@ -49,6 +49,14 @@
     }}</span>
   </button>
 
+  <div class="analysis-error" *ngIf="captureError">
+    <i class="fas fa-exclamation-circle"></i>
+    <div class="error-content">
+      <strong>Помилка</strong>
+      <p>{{ captureError }}</p>
+    </div>
+  </div>
+
   <div class="analysis-error" *ngIf="analysisError">
     <i class="fas fa-exclamation-circle"></i>
     <div class="error-content">

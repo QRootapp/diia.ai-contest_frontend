@@ -22,6 +22,7 @@ export class Slide2PhotoCaptureComponent {
   isPhotoAnalyzed = false;
   gpsError: string | null = null;
   analysisError: string | null = null;
+  captureError: string | null = null;
 
   constructor(
     private router: Router,
@@ -80,6 +81,8 @@ export class Slide2PhotoCaptureComponent {
       error: (error) => {
         console.error('Camera error:', error);
         this.cameraActive = false;
+        this.captureError =
+          typeof error === 'string' ? error : 'Помилка камери';
       },
     });
   }
@@ -114,6 +117,7 @@ export class Slide2PhotoCaptureComponent {
     this.capturedPhoto = null;
     this.isPhotoAnalyzed = false;
     this.analysisError = null;
+    this.captureError = null;
   }
 
   proceedToNextStep(): void {
