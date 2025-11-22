@@ -37,9 +37,7 @@
   <button
     class="capture-button"
     (click)="takeSecondPhoto()"
-    [disabled]="
-      isCapturing || isProcessing || capturedSecondPhoto || timeRemaining > 0
-    "
+    [disabled]="isProcessing || capturedSecondPhoto || timeRemaining > 0"
     *ngIf="!isPhotoAnalyzed"
   >
     <i
