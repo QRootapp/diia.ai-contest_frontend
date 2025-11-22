@@ -148,6 +148,17 @@
       font-weight: 600;
       margin: 0;
       color: #1a1a1a;
+
+      .violation-link {
+        color: inherit;
+        text-decoration: underline;
+        text-decoration-color: rgba(0, 0, 0, 0.2);
+        transition: text-decoration-color 0.2s ease;
+
+        &:hover {
+          text-decoration-color: rgba(0, 0, 0, 0.5);
+        }
+      }
     }
 
     p {
@@ -256,5 +267,28 @@
         box-shadow: 0 4px 16px rgba(255, 215, 0, 0.15);
       }
     }
+  }
+
+  .legal-info {
+    margin-top: 2rem;
+    padding: 0 0.5rem;
+
+    p {
+      font-size: 0.9rem;
+      color: #1a1a1a;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+      text-align: justify;
+
+      &:last-child {
+        margin-bottom: 0;
+        // font-weight: 600;
+        // color: #1a1a1a;
+      }
+    }
+  }
+
+  a.info-card {
+    text-decoration: none;
   }
 }

@@ -31,6 +31,12 @@
           <span class="label">Номер:</span>
           <span class="value">{{ session.firstPhoto.analysis.plate }}</span>
         </div>
+        <div class="detail-row" *ngIf="session.firstPhoto.analysis">
+          <span class="label">Ймовірність:</span>
+          <span class="value">{{
+            formatConfidence(session.firstPhoto.analysis.confidence)
+          }}</span>
+        </div>
       </div>
 
       <div class="photo-preview">
@@ -68,6 +74,12 @@
         <div class="detail-row" *ngIf="session.secondPhoto.analysis">
           <span class="label">Номер:</span>
           <span class="value">{{ session.secondPhoto.analysis.plate }}</span>
+        </div>
+        <div class="detail-row" *ngIf="session.secondPhoto.analysis">
+          <span class="label">Ймовірність:</span>
+          <span class="value">{{
+            formatConfidence(session.secondPhoto.analysis.confidence)
+          }}</span>
         </div>
       </div>
 

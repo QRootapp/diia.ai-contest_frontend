@@ -184,6 +184,12 @@ export class Slide7SubmissionComponent implements OnInit {
   }
 
   formatConfidence(value?: number): string {
-    return value ? `${(value * 100).toFixed(0)}%` : '---';
+    if (value === undefined || value === null) {
+      return '---';
+    }
+    if (value > 1) {
+      return `${value.toFixed(0)}%`;
+    }
+    return `${(value * 100).toFixed(0)}%`;
   }
 }

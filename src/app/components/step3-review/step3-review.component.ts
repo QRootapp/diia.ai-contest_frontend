@@ -45,4 +45,14 @@ export class Slide6ReviewComponent implements OnInit {
   formatCoordinates(lat: number, lon: number): string {
     return `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
   }
+
+  formatConfidence(value?: number): string {
+    if (value === undefined || value === null) {
+      return '---';
+    }
+    if (value > 1) {
+      return `${value.toFixed(0)}%`;
+    }
+    return `${(value * 100).toFixed(0)}%`;
+  }
 }
