@@ -23,6 +23,7 @@ export class Slide5SecondPhotoComponent implements OnInit, OnDestroy {
   session: ViolationSession | null = null;
   capturedSecondPhoto: PhotoData | null = null;
   analysisError: string | null = null;
+  analysisWarning: string | null = null;
   captureError: string | null = null;
   isCapturing = false;
   isProcessing = false;
@@ -99,6 +100,7 @@ export class Slide5SecondPhotoComponent implements OnInit, OnDestroy {
 
     this.isCapturing = true;
     this.analysisError = null;
+    this.analysisWarning = null;
     this.captureError = null;
     this.capturedSecondPhoto = null;
     this.gpsError = null;
@@ -136,6 +138,11 @@ export class Slide5SecondPhotoComponent implements OnInit, OnDestroy {
     });
   }
 
+  private validatePlate(plate: string): boolean {
+    const regex = /^[A-Z]{2}\d{4}[A-Z]{2}$/;
+    return regex.test(plate);
+  }
+
   private submitSecondPhoto(photoData: PhotoData): void {
     if (!photoData.file) {
       this.analysisError = 'Файл другого фото відсутній. Спробуйте ще раз.';
@@ -150,6 +157,18 @@ export class Slide5SecondPhotoComponent implements OnInit, OnDestroy {
           this.capturedSecondPhoto = null;
           this.isProcessing = false;
           this.isPhotoAnalyzed = false;
+          return;
+        }
+
+        if (!this.validatePlate(analysis.plate)) {
+          this.analysisWarning =
+            'Розпізнаний номер не відповідає формату українських номерів (XX0000XX). Будь ласка, переробіть фото.';
+          this.analysisError = null;
+          // Show result + warning
+          photoData.analysis = analysis;
+          this.capturedSecondPhoto = photoData;
+          this.isProcessing = false;
+          this.isPhotoAnalyzed = true; // Allows viewing result, but Continue is blocked
           return;
         }
 
@@ -172,6 +191,8 @@ export class Slide5SecondPhotoComponent implements OnInit, OnDestroy {
         this.capturedSecondPhoto = photoData;
         this.isProcessing = false;
         this.isPhotoAnalyzed = true;
+        this.analysisError = null;
+        this.analysisWarning = null;
       },
       error: (error) => {
         console.error('Error analyzing second photo:', error);

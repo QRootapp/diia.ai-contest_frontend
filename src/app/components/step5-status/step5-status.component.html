@@ -29,7 +29,7 @@
           <span class="value">{{ report.report_number }}</span>
         </div>
         <span class="status-badge" [ngClass]="report.status">{{
-          report.status | titlecase
+          getStatusLabel(report.status)
         }}</span>
       </div>
 
@@ -46,7 +46,7 @@
         </div>
         <div class="detail-row">
           <span class="label">Статус</span>
-          <span class="value">{{ report.status | titlecase }}</span>
+          <span class="value">{{ getStatusLabel(report.status) }}</span>
         </div>
         <div class="detail-row">
           <span class="label">Заявник</span>

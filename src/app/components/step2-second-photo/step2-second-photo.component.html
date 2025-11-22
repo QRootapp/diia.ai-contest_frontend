@@ -72,6 +72,14 @@
     </div>
   </div>
 
+  <div class="analysis-warning" *ngIf="analysisWarning">
+    <i class="fas fa-exclamation-triangle"></i>
+    <div class="warning-content">
+      <strong>Увага</strong>
+      <p>{{ analysisWarning }}</p>
+    </div>
+  </div>
+
   <div class="analysis-error" *ngIf="analysisError">
     <i class="fas fa-exclamation-circle"></i>
     <div class="error-content">
@@ -163,7 +171,11 @@
       </div>
     </div>
 
-    <button class="continue-button sticky-action" (click)="proceedToReview()">
+    <button
+      class="continue-button sticky-action"
+      (click)="proceedToReview()"
+      *ngIf="!analysisWarning"
+    >
       <span>Перейти до підсумків</span>
       <i class="fas fa-arrow-right"></i>
     </button>

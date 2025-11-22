@@ -167,6 +167,7 @@ export class Slide7SubmissionComponent implements OnInit {
     return date.toLocaleTimeString('uk-UA', {
       hour: '2-digit',
       minute: '2-digit',
+      second: '2-digit',
     });
   }
 
@@ -176,7 +177,8 @@ export class Slide7SubmissionComponent implements OnInit {
 
   formatDuration(seconds: number): string {
     const mins = Math.floor(seconds / 60);
-    return `${mins} хвилин`;
+    const secs = seconds % 60;
+    return `${mins} хв ${secs} с`;
   }
 
   formatCoordinates(lat: number, lon: number): string {

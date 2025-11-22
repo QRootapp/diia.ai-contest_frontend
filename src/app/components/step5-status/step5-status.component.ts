@@ -79,6 +79,7 @@ export class Slide9StatusComponent implements OnInit {
     return date.toLocaleTimeString('uk-UA', {
       hour: '2-digit',
       minute: '2-digit',
+      second: '2-digit',
     });
   }
 
@@ -86,5 +87,16 @@ export class Slide9StatusComponent implements OnInit {
     if (!this.report) return null;
     const photo = this.report.photos.find((p) => p.photo_type === photoType);
     return photo?.photo_url || null;
+  }
+
+  getStatusLabel(status: string): string {
+    const labels: { [key: string]: string } = {
+      draft: 'Чернетка',
+      submitted: 'Надіслано',
+      under_review: 'На розгляді',
+      resolved: 'Вирішено',
+      rejected: 'Відхилено',
+    };
+    return labels[status] || status;
   }
 }

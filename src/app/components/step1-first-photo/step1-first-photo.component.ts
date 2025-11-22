@@ -22,6 +22,7 @@ export class Slide2PhotoCaptureComponent {
   isPhotoAnalyzed = false;
   gpsError: string | null = null;
   analysisError: string | null = null;
+  analysisWarning: string | null = null;
   captureError: string | null = null;
 
   constructor(
@@ -87,6 +88,11 @@ export class Slide2PhotoCaptureComponent {
     });
   }
 
+  private validatePlate(plate: string): boolean {
+    const regex = /^[A-Z]{2}\d{4}[A-Z]{2}$/;
+    return regex.test(plate);
+  }
+
   private submitForAnalysis(photoData: PhotoData): void {
     if (!photoData.file) {
       this.analysisError = 'Файл фото відсутній. Спробуйте ще раз.';
@@ -104,11 +110,24 @@ export class Slide2PhotoCaptureComponent {
           return;
         }
 
+        if (!this.validatePlate(analysis.plate)) {
+          this.analysisWarning =
+            'Розпізнаний номер не відповідає формату українських номерів (XX0000XX). Будь ласка, переробіть фото.';
+          this.analysisError = null;
+          // Show the result anyway so the user sees it
+          photoData.analysis = analysis;
+          this.capturedPhoto = photoData;
+          this.isProcessing = false;
+          this.isPhotoAnalyzed = true; // Allow viewing, but Continue button will be conditional
+          return;
+        }
+
         photoData.analysis = analysis;
         this.stateService.startSession(photoData);
         this.isProcessing = false;
         this.isPhotoAnalyzed = true;
         this.analysisError = null;
+        this.analysisWarning = null;
       },
       error: (error) => {
         console.error('Error analyzing first photo:', error);
@@ -125,6 +144,7 @@ export class Slide2PhotoCaptureComponent {
     this.capturedPhoto = null;
     this.isPhotoAnalyzed = false;
     this.analysisError = null;
+    this.analysisWarning = null;
     this.captureError = null;
   }
 
