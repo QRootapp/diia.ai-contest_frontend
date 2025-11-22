@@ -5,7 +5,7 @@ import { Slide5SecondPhotoComponent } from './components/step2-second-photo/step
 import { Slide6ReviewComponent } from './components/step3-review/step3-review.component';
 import { Slide7SubmissionComponent } from './components/step4-submission/step4-submission.component';
 import { Slide9StatusComponent } from './components/step5-status/step5-status.component';
-пше;
+
 import { MyApplicationsComponent } from './components/my-applications/my-applications.component';
 import { sessionGuard, statusGuard } from './guards/session.guard';
 
