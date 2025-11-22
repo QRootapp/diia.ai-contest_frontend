@@ -89,4 +89,8 @@ export class ViolationStateService {
   reset(): void {
     this.sessionSubject.next(null);
   }
+
+  clearSession(): void {
+    this.reset();
+  }
 }

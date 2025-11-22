@@ -153,6 +153,18 @@ export class Slide5SecondPhotoComponent implements OnInit, OnDestroy {
           return;
         }
 
+        if (
+          this.session?.firstPhoto?.analysis &&
+          analysis.plate !== this.session.firstPhoto.analysis.plate
+        ) {
+          this.analysisError =
+            'Номери не співпадають з першим фото. Переробіть фото будь ласка.';
+          this.capturedSecondPhoto = null;
+          this.isProcessing = false;
+          this.isPhotoAnalyzed = false;
+          return;
+        }
+
         photoData.analysis = analysis;
         const durationSeconds = this.calculateDurationSeconds(photoData);
         this.stateService.addSecondPhoto(photoData, durationSeconds);
@@ -178,6 +190,11 @@ export class Slide5SecondPhotoComponent implements OnInit, OnDestroy {
       photoData.timestamp.getTime() -
       this.session.firstPhoto.timestamp.getTime();
     return Math.max(0, Math.floor(diff / 1000));
+  }
+
+  restartProcess(): void {
+    this.stateService.clearSession();
+    this.router.navigate(['/capture-first-photo']);
   }
 
   proceedToReview(): void {

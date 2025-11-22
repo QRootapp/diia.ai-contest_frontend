@@ -77,6 +77,13 @@
     <div class="error-content">
       <strong>Помилка аналізу</strong>
       <p>{{ analysisError }}</p>
+      <button
+        *ngIf="analysisError.includes('не співпадають')"
+        class="restart-button"
+        (click)="restartProcess()"
+      >
+        Розпочати процес заново
+      </button>
     </div>
   </div>
 
