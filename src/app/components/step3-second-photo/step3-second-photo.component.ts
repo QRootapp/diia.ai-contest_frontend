@@ -16,8 +16,8 @@ import { TimerService } from '../../services/timer.service';
   selector: 'app-slide5-second-photo',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './slide5-second-photo.component.html',
-  styleUrls: ['./slide5-second-photo.component.scss'],
+  templateUrl: './step3-second-photo.component.html',
+  styleUrls: ['./step3-second-photo.component.scss'],
 })
 export class Slide5SecondPhotoComponent implements OnInit, OnDestroy {
   session: ViolationSession | null = null;

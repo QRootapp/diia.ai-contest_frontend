@@ -9,8 +9,8 @@ import { ViolationApiService } from '../../services/violation-api.service';
   selector: 'app-slide9-status',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './slide9-status.component.html',
-  styleUrls: ['./slide9-status.component.scss'],
+  templateUrl: './step6-status.component.html',
+  styleUrls: ['./step6-status.component.scss'],
 })
 export class Slide9StatusComponent implements OnInit {
   report: Report | null = null;

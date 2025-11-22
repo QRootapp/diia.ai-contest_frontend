@@ -50,6 +50,10 @@ export class MyApplicationsComponent implements OnInit {
     this.router.navigate(['/status', app.id]);
   }
 
+  goBack(): void {
+    this.router.navigate(['/intro']);
+  }
+
   startNewReport(): void {
     this.router.navigate(['/capture-first-photo']);
   }

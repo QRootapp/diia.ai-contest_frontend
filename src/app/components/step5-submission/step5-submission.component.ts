@@ -10,8 +10,8 @@ import { ViolationStateService } from '../../services/violation-state.service';
   selector: 'app-slide7-submission',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './slide7-submission.component.html',
-  styleUrls: ['./slide7-submission.component.scss'],
+  templateUrl: './step5-submission.component.html',
+  styleUrls: ['./step5-submission.component.scss'],
 })
 export class Slide7SubmissionComponent implements OnInit {
   session: ViolationSession | null = null;

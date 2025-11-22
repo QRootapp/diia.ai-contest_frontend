@@ -187,11 +187,11 @@
       transition: all 0.25s ease;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
-      &:last-child {
-        border-color: #4169e1;
-        background: #e8f0fe;
-        box-shadow: 0 4px 12px rgba(65, 105, 225, 0.15);
-      }
+      // &:last-child {
+      //   // border-color: #4169e1; // Removed specific style
+      //   // background: #e8f0fe;   // Removed specific style
+      //   // box-shadow: 0 4px 12px rgba(65, 105, 225, 0.15); // Removed specific style
+      // }
 
       .sign-icon {
         width: 64px;

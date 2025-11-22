@@ -11,8 +11,8 @@ import { PhotoData, PlateRecognition } from '../../models/violation.model';
   selector: 'app-slide2-photo-capture',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './slide2-photo-capture.component.html',
-  styleUrls: ['./slide2-photo-capture.component.scss'],
+  templateUrl: './step2-first-photo.component.html',
+  styleUrls: ['./step2-first-photo.component.scss'],
 })
 export class Slide2PhotoCaptureComponent {
   isGpsActive = false;

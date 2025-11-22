@@ -2,7 +2,9 @@
   background: linear-gradient(180deg, #e8f4f8 0%, #d4f1e8 50%, #fff9e6 100%);
   min-height: 100vh;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
+  padding-bottom: 6rem;
 
   h1 {
     color: #1a1a1a;
