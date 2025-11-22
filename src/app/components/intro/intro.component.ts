@@ -7,8 +7,8 @@ import { ViolationStateService } from '../../services/violation-state.service';
   selector: 'app-slide1-intro',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './step1-intro.component.html',
-  styleUrls: ['./step1-intro.component.scss'],
+  templateUrl: './intro.component.html',
+  styleUrls: ['./intro.component.scss'],
 })
 export class Slide1IntroComponent {
   title = 'Захист прав людей з інвалідністю';

@@ -199,17 +199,14 @@
     justify-content: center;
     gap: 0.75rem;
     cursor: pointer;
-    transition: all 0.25s ease;
     box-shadow: 0 4px 12px rgba(65, 105, 225, 0.25);
 
     &:hover {
       background: #365abd;
-      transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(65, 105, 225, 0.3);
     }
 
     &:active {
-      transform: translateY(0);
     }
 
     i {

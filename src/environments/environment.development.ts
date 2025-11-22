@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api',
+  apiUrl: 'https://ai-contest-qroot-app-team-back-tgf3d.ondigitalocean.app/api',
 };

@@ -6,6 +6,42 @@
   overflow-y: visible;
   padding-bottom: 6rem;
 
+  .header-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    position: relative;
+
+    .back-button {
+      background: none;
+      border: none;
+      color: #1a1a1a;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+    }
+
+    h1 {
+      flex: 1;
+      margin-bottom: 0;
+    }
+  }
+
   h1 {
     color: #1a1a1a;
     font-size: 1.75rem;
@@ -276,18 +312,15 @@
     justify-content: center;
     gap: 0.75rem;
     cursor: pointer;
-    transition: all 0.25s ease;
     margin-bottom: 1.5rem;
     box-shadow: 0 4px 12px rgba(65, 105, 225, 0.25);
 
     &:hover:not(:disabled) {
       background: #365abd;
-      transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(65, 105, 225, 0.3);
     }
 
     &:active:not(:disabled) {
-      transform: translateY(0);
     }
 
     &:disabled {
@@ -524,16 +557,13 @@
       justify-content: center;
       gap: 0.75rem;
       cursor: pointer;
-      transition: all 0.3s ease;
 
       &:hover {
         background: #45a049;
-        transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
       }
 
       &:active {
-        transform: translateY(0);
       }
 
       i {

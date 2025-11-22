@@ -11,8 +11,8 @@ import { PhotoData, PlateRecognition } from '../../models/violation.model';
   selector: 'app-slide2-photo-capture',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './step2-first-photo.component.html',
-  styleUrls: ['./step2-first-photo.component.scss'],
+  templateUrl: './step1-first-photo.component.html',
+  styleUrls: ['./step1-first-photo.component.scss'],
 })
 export class Slide2PhotoCaptureComponent {
   isGpsActive = false;
@@ -118,6 +118,10 @@ export class Slide2PhotoCaptureComponent {
 
   proceedToNextStep(): void {
     this.router.navigate(['/capture-second-photo']);
+  }
+
+  goBack(): void {
+    this.router.navigate(['/intro']);
   }
 
   formatTime(date: Date): string {

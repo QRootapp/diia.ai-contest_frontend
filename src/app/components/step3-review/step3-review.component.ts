@@ -8,8 +8,8 @@ import { ViolationStateService } from '../../services/violation-state.service';
   selector: 'app-slide6-review',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './step4-review.component.html',
-  styleUrls: ['./step4-review.component.scss'],
+  templateUrl: './step3-review.component.html',
+  styleUrls: ['./step3-review.component.scss'],
 })
 export class Slide6ReviewComponent implements OnInit {
   session: ViolationSession | null = null;
