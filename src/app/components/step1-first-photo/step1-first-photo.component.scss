@@ -63,7 +63,7 @@
     padding: 1.25rem;
     margin-bottom: 1rem;
     position: relative;
-    min-height: 320px;
+    min-height: auto;
     display: flex;
     flex-direction: column;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
@@ -149,7 +149,6 @@
     background: white;
     border-radius: 20px;
     padding: 1.25rem;
-    margin-bottom: 1.5rem;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 
     .card-header {
@@ -202,46 +201,27 @@
       background: white;
       border: 2px solid #e0e0e0;
       border-radius: 16px;
-      padding: 1.25rem;
+      padding: 1rem;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
-      text-align: center;
-      gap: 0.75rem;
+      text-align: left;
+      gap: 1rem;
       transition: all 0.25s ease;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
-      // &:last-child {
-      //   // border-color: #4169e1; // Removed specific style
-      //   // background: #e8f0fe;   // Removed specific style
-      //   // box-shadow: 0 4px 12px rgba(65, 105, 225, 0.15); // Removed specific style
-      // }
-
-      .sign-icon {
-        width: 64px;
-        height: 64px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.75rem;
-        font-weight: 700;
-
-        &.parking {
-          background: #2196f3;
-          color: white;
-        }
-
-        &.disability {
-          background: #4169e1;
-          color: white;
-        }
+      .sign-image {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        flex-shrink: 0;
       }
 
       .sign-info {
         display: flex;
         flex-direction: column;
         gap: 0.25rem;
+        flex: 1;
 
         strong {
           font-size: 0.95rem;

@@ -78,7 +78,7 @@
     padding: 1.25rem;
     margin-bottom: 1rem;
     position: relative;
-    min-height: 320px;
+    min-height: auto;
     display: flex;
     flex-direction: column;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
@@ -450,37 +450,49 @@
     }
   }
 
-  .tip-card {
-    background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+  .requirements-card {
+    background: white;
     border-radius: 20px;
     padding: 1.25rem;
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start;
+    margin-bottom: 1.5rem;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 
-    i {
-      width: 40px;
-      height: 40px;
-      background: rgba(255, 193, 7, 0.2);
-      border-radius: 12px;
+    .card-header {
       display: flex;
       align-items: center;
-      justify-content: center;
-      color: #f59e0b;
-      font-size: 1.2rem;
-      flex-shrink: 0;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      color: #333;
+      font-weight: 600;
+
+      i {
+        font-size: 1.25rem;
+        color: #333;
+      }
     }
 
-    p {
-      margin: 0;
-      color: #666;
-      font-size: 0.9rem;
-      line-height: 1.6;
-      flex: 1;
+    .requirements-list {
+      list-style: none;
 
-      strong {
+      li {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
         color: #333;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        i {
+          color: #4169e1;
+          font-size: 1.1rem;
+        }
+
+        span {
+          font-size: 0.95rem;
+        }
       }
     }
   }

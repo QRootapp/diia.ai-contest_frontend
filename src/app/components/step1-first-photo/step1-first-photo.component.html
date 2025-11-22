@@ -19,9 +19,25 @@
       }}</span>
     </div>
 
-    <div class="camera-preview" [class.active]="cameraActive">
-      <i class="fas fa-camera"></i>
-      <p>{{ cameraActive ? "Камера активна" : "Натисніть кнопку для фото" }}</p>
+    <div class="requirements-card">
+      <div class="card-header">
+        <i class="fas fa-camera"></i>
+        <span>Спробуйте щоб у кадр потрапив:</span>
+      </div>
+      <ul class="requirements-list">
+        <li>
+          <i class="fas fa-check-circle"></i>
+          <span>Автомобіль повністю</span>
+        </li>
+        <li>
+          <i class="fas fa-check-circle"></i>
+          <span>Номерний знак автомобіля</span>
+        </li>
+        <li>
+          <i class="fas fa-check-circle"></i>
+          <span>Знак паркування для інвалідів</span>
+        </li>
+      </ul>
     </div>
   </div>
 
@@ -144,32 +160,9 @@
     </button>
   </div>
 
-  <div class="requirements-card" *ngIf="!isPhotoAnalyzed">
-    <div class="card-header">
-      <i class="fas fa-camera"></i>
-      <span>Спробуйте щоб у кадр потрапив:</span>
-    </div>
-    <ul class="requirements-list">
-      <li>
-        <i class="fas fa-check-circle"></i>
-        <span>Номерний знак автомобіля</span>
-      </li>
-      <li>
-        <i class="fas fa-check-circle"></i>
-        <span>Знак паркування для інвалідів</span>
-      </li>
-      <li>
-        <i class="fas fa-check-circle"></i>
-        <span>Автомобіль повністю</span>
-      </li>
-    </ul>
-  </div>
-
   <div class="parking-signs" *ngIf="!isPhotoAnalyzed">
     <div class="sign-card">
-      <div class="sign-icon parking">
-        <span>P</span>
-      </div>
+      <img src="/assets/RSS_5_42_1.png" alt="Знак 5.42.1" class="sign-image" />
       <div class="sign-info">
         <strong>Знак 5.42.1</strong>
         <span>Загальна парковка</span>
@@ -177,9 +170,7 @@
     </div>
 
     <div class="sign-card">
-      <div class="sign-icon disability">
-        <i class="fas fa-wheelchair"></i>
-      </div>
+      <img src="/assets/RSS_7_17.png" alt="Знак 7.17" class="sign-image" />
       <div class="sign-info">
         <strong>Знак 7.17</strong>
         <span>Для інвалідів</span>

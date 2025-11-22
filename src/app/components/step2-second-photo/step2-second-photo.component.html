@@ -20,18 +20,26 @@
       <span>{{ gpsError || "GPS: Активно" }}</span>
     </div>
 
-    <div class="camera-preview" [class.active]="isCapturing">
-      <i class="fas fa-camera"></i>
-      <p>
-        {{
-          isCapturing
-            ? "Камера активна"
-            : "Зробіть друге фото під тим же ракурсом"
-        }}
-      </p>
+    <div class="requirements-card">
+      <div class="card-header">
+        <i class="fas fa-camera"></i>
+        <span>Спробуйте щоб у кадр потрапив:</span>
+      </div>
+      <ul class="requirements-list">
+        <li>
+          <i class="fas fa-check-circle"></i>
+          <span>Автомобіль повністю</span>
+        </li>
+        <li>
+          <i class="fas fa-check-circle"></i>
+          <span>Номерний знак автомобіля</span>
+        </li>
+        <li>
+          <i class="fas fa-check-circle"></i>
+          <span>Знак паркування для інвалідів</span>
+        </li>
+      </ul>
     </div>
-
-    <!-- Timestamp removed as requested -->
   </div>
 
   <button
@@ -151,13 +159,5 @@
       <span>Перейти до підсумків</span>
       <i class="fas fa-arrow-right"></i>
     </button>
-  </div>
-
-  <div class="tip-card" *ngIf="!isPhotoAnalyzed">
-    <i class="fas fa-info-circle"></i>
-    <p>
-      <strong>Порада:</strong> Зробіть фото під тим самим ракурсом для кращої
-      фіксації
-    </p>
   </div>
 </div>
